@@ -20,9 +20,9 @@ body{font-family:'Inter', -apple-system, system-ui, sans-serif; background:var(-
 #main{display:flex;flex:1;overflow:hidden;position:relative}
 #sidebar{width:280px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border-color);background:#fff;transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);z-index:200}
 #canvas-col{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#1a1a1a;position:relative}
-#canvas-area{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center; touch-action:none}
-#canvas-container{position:relative; transition:transform 0.1s ease-out; transform-origin:0 0}
-#bg-img{object-fit:contain;pointer-events:none;user-select:none;display:none;position:absolute; top:0; left:0}
+#canvas-area{flex:1;position:relative;overflow:hidden;background:#1a1a1a;touch-action:none}
+#canvas-container{position:absolute; top:0; left:0; transition:transform 0.1s ease-out; transform-origin:0 0}
+#bg-img{width:100%; height:100%; object-fit:contain; pointer-events:none; user-select:none; display:none; position:absolute; top:0; left:0}
 
 /* ── Components ── */
 .tb-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--border-color);border-radius:10px;background:#fff;color:var(--text-main);cursor:pointer;font-size:14px;font-weight:600;transition:all 0.2s;user-select:none;white-space:nowrap}
@@ -63,7 +63,7 @@ input[type=range]{accent-color:var(--primary);cursor:pointer}
 #mob-defect-fab{display:none;position:fixed;bottom:80px;right:20px;width:56px;height:56px;border-radius:28px;background:var(--primary);color:#fff;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(55,138,221,0.4);z-index:140;border:none;font-size:24px}
 
 /* ── Canvas ── */
-#hint{color:#999;font-size:16px;text-align:center;padding:40px;display:flex;flex-direction:column;align-items:center;gap:16px}
+#hint{position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); color:#999; font-size:16px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; pointer-events:none}
 #hint i{font-size:64px;color:#333}
 #ann-canvas{position:absolute; top:0; left:0; cursor:crosshair;touch-action:none; user-select:none; -webkit-user-select:none}
 
@@ -409,29 +409,52 @@ document.addEventListener('paste',e=>{
   for(const it of(e.clipboardData?.items||[])){if(it.type.startsWith('image/')){loadImg(it.getAsFile());break;}}
 });
 function loadImg(file){
+  if(!file) return;
   const url=URL.createObjectURL(file);
-  bgImg.src=url; 
   hint.style.display='none';
+  
+  // Create a temporary image to get natural dimensions if needed, 
+  // but using the existing bgImg is fine.
+  bgImg.src=url; 
   bgImg.onload=()=>{
-    imgLoaded=true; annotations=[];
+    if(bgImg.naturalWidth === 0 || bgImg.naturalHeight === 0) {
+      console.error("Failed to load image dimensions");
+      return;
+    }
+    imgLoaded=true; 
+    annotations=[];
     annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
     resizeCanvas();
-    // Flash status
+    
     statusEl.textContent = "រូបភាពបានបញ្ចូលរួចរាល់! សូមជ្រើសរើសប្រភេទបញ្ហា។";
-    setTimeout(() => { if(selectedDef) statusEl.textContent=`ជ្រើស: ${selectedDef.km} · ${selectedDef.zh}`; }, 3000);
+    setTimeout(() => { 
+      if(selectedDef) statusEl.textContent=`ជ្រើស: ${selectedDef.km} · ${selectedDef.zh}`; 
+      else statusEl.textContent = "សូមជ្រើសរើសប្រភេទបញ្ហា រួចចាប់ផ្តើមគូស";
+    }, 3000);
+  };
+  bgImg.onerror=()=>{
+    statusEl.textContent = "❌ បរាជ័យក្នុងការបញ្ចូលរូបភាព!";
+    hint.style.display='flex';
   };
 }
 function resizeCanvas(){
   if(!imgLoaded)return;
   const area=document.getElementById('canvas-area');
-  const aW=area.clientWidth,aH=area.clientHeight;
-  const sc=Math.min(aW/bgImg.naturalWidth,aH/bgImg.naturalHeight,1);
-  const dW=Math.round(bgImg.naturalWidth*sc),dH=Math.round(bgImg.naturalHeight*sc);
+  const aW=area.clientWidth, aH=area.clientHeight;
+  if(aW === 0 || aH === 0) return;
   
-  bgImg.width=dW; bgImg.height=dH;
-  canvas.width=dW; canvas.height=dH;
+  const sc=Math.min(aW/bgImg.naturalWidth, aH/bgImg.naturalHeight, 1);
+  const dW=Math.round(bgImg.naturalWidth*sc);
+  const dH=Math.round(bgImg.naturalHeight*sc);
   
-  bgImg.style.display='block';
+  canvas.width = dW;
+  canvas.height = dH;
+  
+  canvasContainer.style.width = dW + 'px';
+  canvasContainer.style.height = dH + 'px';
+  
+  bgImg.style.display = 'block';
+  
   resetZoom();
 }
 window.addEventListener('resize',()=>{if(imgLoaded)resizeCanvas();});
