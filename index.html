@@ -20,7 +20,9 @@ body{font-family:'Inter', -apple-system, system-ui, sans-serif; background:var(-
 #main{display:flex;flex:1;overflow:hidden;position:relative}
 #sidebar{width:280px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border-color);background:#fff;transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);z-index:200}
 #canvas-col{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#1a1a1a;position:relative}
-#canvas-area{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+#canvas-area{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center; touch-action:none}
+#canvas-container{position:relative; transition:transform 0.1s ease-out; transform-origin:0 0}
+#bg-img{object-fit:contain;pointer-events:none;user-select:none;display:none;position:absolute; top:0; left:0}
 
 /* ── Components ── */
 .tb-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--border-color);border-radius:10px;background:#fff;color:var(--text-main);cursor:pointer;font-size:14px;font-weight:600;transition:all 0.2s;user-select:none;white-space:nowrap}
@@ -63,7 +65,11 @@ input[type=range]{accent-color:var(--primary);cursor:pointer}
 /* ── Canvas ── */
 #hint{color:#999;font-size:16px;text-align:center;padding:40px;display:flex;flex-direction:column;align-items:center;gap:16px}
 #hint i{font-size:64px;color:#333}
-#ann-canvas{cursor:crosshair;touch-action:none; user-select:none; -webkit-user-select:none}
+#ann-canvas{position:absolute; top:0; left:0; cursor:crosshair;touch-action:none; user-select:none; -webkit-user-select:none}
+
+/* Zoom controls */
+.zoom-btns{position:absolute; top:20px; right:20px; display:flex; flex-direction:column; gap:8px; z-index:110}
+.z-btn{width:40px; height:40px; border-radius:8px; background:rgba(255,255,255,0.9); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-size:20px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1)}
 #bottombar{padding:8px 16px;background:#fff;border-top:1px solid var(--border-color);display:flex;align-items:center;font-size:12px;color:var(--text-sub)}
 
 /* ── Responsive ── */
@@ -77,9 +83,11 @@ input[type=range]{accent-color:var(--primary);cursor:pointer}
   #bottombar{display:none}
   .tb-btn{padding:8px 12px}
   #sidebar-close{display:block;width:40px;height:4px;background:#ddd;margin:8px auto;border-radius:2px;border:none}
-  #search-wrap{padding:8px 16px}
-  .desktop-only{display:none !important}
-}
+   #search-wrap{padding:8px 16px}
+   .desktop-only{display:none !important}
+   .z-btn{width:36px; height:36px; font-size:18px}
+   .zoom-btns{top:10px; right:10px}
+ }
 
 .hl{background:#FFF3CC;font-weight:700;border-radius:2px}
 </style>
@@ -126,7 +134,10 @@ input[type=range]{accent-color:var(--primary);cursor:pointer}
         <input type="text" id="search-box" placeholder="ស្វែងរកប្រភេទបញ្ហា..." autocomplete="off">
       </div>
       <div id="def-scroll">
-        <div class="sec-lbl">ប្រភេទបញ្ហា</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-right:12px">
+          <div class="sec-lbl">ប្រភេទបញ្ហា</div>
+          <button class="tb-btn" id="btn-clr-mob" style="padding:4px 8px; font-size:11px"><i class="ti ti-trash"></i> លុបទាំងអស់</button>
+        </div>
         <div id="def-list"></div>
       </div>
       <div id="ann-section" class="desktop-only">
@@ -139,8 +150,15 @@ input[type=range]{accent-color:var(--primary);cursor:pointer}
     <div id="canvas-col">
       <div id="canvas-area">
         <div id="hint"><i class="ti ti-photo-plus"></i><span>សូមបញ្ចូលរូបភាពដើម្បីចាប់ផ្តើម</span></div>
-        <img id="bg-img" alt="Background">
-        <canvas id="ann-canvas"></canvas>
+        <div id="canvas-container">
+          <img id="bg-img" alt="Background">
+          <canvas id="ann-canvas"></canvas>
+        </div>
+        <div class="zoom-btns">
+          <button class="z-btn" id="z-in" title="Zoom In"><i class="ti ti-plus"></i></button>
+          <button class="z-btn" id="z-out" title="Zoom Out"><i class="ti ti-minus"></i></button>
+          <button class="z-btn" id="z-fit" title="Fit View"><i class="ti ti-maximize"></i></button>
+        </div>
       </div>
       <div id="bottombar">
         <i class="ti ti-info-circle" style="margin-right:8px"></i>
@@ -207,9 +225,50 @@ const sidebarClose=document.getElementById('sidebar-close');
 const mobDefectFab=document.getElementById('mob-defect-fab');
 const mobNavBtns=document.querySelectorAll('.mob-nav-btn');
 
+const canvasContainer=document.getElementById('canvas-container');
+const zIn=document.getElementById('z-in');
+const zOut=document.getElementById('z-out');
+const zFit=document.getElementById('z-fit');
+
 let mode='circle', selectedDef=null, annotations=[], drawing=false;
 let startX,startY,imgLoaded=false;
 let draggingAnn=null, dragOffX, dragOffY;
+let scale=1, transX=0, transY=0;
+let isPanning=false, panStartX, panStartY;
+
+/* ── Zoom & Pan ── */
+function updateTransform(){
+  canvasContainer.style.transform=`translate(${transX}px, ${transY}px) scale(${scale})`;
+}
+
+zIn.addEventListener('click',()=>{ scale *= 1.2; updateTransform(); });
+zOut.addEventListener('click',()=>{ scale /= 1.2; updateTransform(); });
+zFit.addEventListener('click',resetZoom);
+
+function resetZoom(){
+  if(!imgLoaded)return;
+  const area=document.getElementById('canvas-area');
+  const sc=Math.min(area.clientWidth/canvas.width, area.clientHeight/canvas.height, 1);
+  scale=sc;
+  transX=(area.clientWidth-canvas.width*scale)/2;
+  transY=(area.clientHeight-canvas.height*scale)/2;
+  updateTransform();
+}
+
+// Mouse wheel zoom
+document.getElementById('canvas-area').addEventListener('wheel', e => {
+  if(!imgLoaded)return;
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  const rect = canvasContainer.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+  
+  transX -= mouseX * (delta - 1);
+  transY -= mouseY * (delta - 1);
+  scale *= delta;
+  updateTransform();
+}, {passive:false});
 
 /* ── Mobile UI ── */
 if(mobDefectFab) mobDefectFab.addEventListener('click',()=>{ sidebar.classList.add('open'); });
@@ -275,7 +334,15 @@ function selectDef(d, elClicked){
   if(elClicked) elClicked.classList.add('sel');
   statusEl.textContent=`ជ្រើស: ${d.km} · ${d.zh}`;
   if(window.innerWidth<=768){ sidebar.classList.remove('open'); }
+  
+  // Auto-switch to drawing mode if in 'move' mode
   if(mode==='move') setMode('circle');
+  
+  // Visual feedback: simple pulse
+  if(elClicked) {
+    elClicked.style.transform = 'scale(0.95)';
+    setTimeout(() => elClicked.style.transform = '', 100);
+  }
 }
 
 searchBox.addEventListener('input',()=>{ renderDefects(searchBox.value.trim()); });
@@ -325,12 +392,16 @@ document.addEventListener('keydown',e=>{
 });
 
 document.getElementById('btn-u').addEventListener('click',undoLast);
-document.getElementById('btn-clr').addEventListener('click',()=>{
+const clearAll = () => {
   if(confirm("តើអ្នកប្រាកដជាចង់លុបទាំងអស់មែនទេ?")){
     annotations=[];redraw();
     annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
   }
-});
+};
+
+document.getElementById('btn-clr').addEventListener('click', clearAll);
+const btnClrMob = document.getElementById('btn-clr-mob');
+if(btnClrMob) btnClrMob.addEventListener('click', clearAll);
 
 /* ── Image load ── */
 document.getElementById('file-in').addEventListener('change',e=>{const f=e.target.files[0];if(f)loadImg(f);});
@@ -339,11 +410,15 @@ document.addEventListener('paste',e=>{
 });
 function loadImg(file){
   const url=URL.createObjectURL(file);
-  bgImg.src=url; bgImg.style.display='block'; hint.style.display='none';
+  bgImg.src=url; 
+  hint.style.display='none';
   bgImg.onload=()=>{
     imgLoaded=true; annotations=[];
     annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
     resizeCanvas();
+    // Flash status
+    statusEl.textContent = "រូបភាពបានបញ្ចូលរួចរាល់! សូមជ្រើសរើសប្រភេទបញ្ហា។";
+    setTimeout(() => { if(selectedDef) statusEl.textContent=`ជ្រើស: ${selectedDef.km} · ${selectedDef.zh}`; }, 3000);
   };
 }
 function resizeCanvas(){
@@ -352,18 +427,19 @@ function resizeCanvas(){
   const aW=area.clientWidth,aH=area.clientHeight;
   const sc=Math.min(aW/bgImg.naturalWidth,aH/bgImg.naturalHeight,1);
   const dW=Math.round(bgImg.naturalWidth*sc),dH=Math.round(bgImg.naturalHeight*sc);
-  const ox=Math.round((aW-dW)/2),oy=Math.round((aH-dH)/2);
-  bgImg.style.cssText=`display:block;position:absolute;left:${ox}px;top:${oy}px;width:${dW}px;height:${dH}px;transform:none`;
-  canvas.width=dW;canvas.height=dH;
-  canvas.style.cssText=`position:absolute;left:${ox}px;top:${oy}px;width:${dW}px;height:${dH}px;cursor:${canvas.style.cursor}`;
-  redraw();
+  
+  bgImg.width=dW; bgImg.height=dH;
+  canvas.width=dW; canvas.height=dH;
+  
+  bgImg.style.display='block';
+  resetZoom();
 }
 window.addEventListener('resize',()=>{if(imgLoaded)resizeCanvas();});
 
 /* ── Canvas events ── */
 function getPos(e){
   const r=canvas.getBoundingClientRect(),s=(e.touches&&e.touches.length)?e.touches[0]:(e.changedTouches?e.changedTouches[0]:e);
-  return{x:s.clientX-r.left,y:s.clientY-r.top};
+  return{x:(s.clientX-r.left)/scale,y:(s.clientY-r.top)/scale};
 }
 
 function getHitAnn(p){
@@ -384,9 +460,21 @@ function getHitAnn(p){
   return null;
 }
 
+let lastPinchDist = 0;
+
 canvas.addEventListener('mousedown',e=>{
   if(!imgLoaded)return;
   const p=getPos(e);
+  
+  // Pan with Middle Mouse or Space (not implemented yet)
+  if(e.button === 1 || (e.button === 0 && e.shiftKey)) {
+    isPanning = true;
+    panStartX = e.clientX - transX;
+    panStartY = e.clientY - transY;
+    canvas.style.cursor = 'grabbing';
+    return;
+  }
+
   if(mode==='move'){
     draggingAnn=getHitAnn(p);
     if(draggingAnn){
@@ -400,6 +488,13 @@ canvas.addEventListener('mousedown',e=>{
 });
 
 canvas.addEventListener('mousemove',e=>{
+  if(isPanning) {
+    transX = e.clientX - panStartX;
+    transY = e.clientY - panStartY;
+    updateTransform();
+    return;
+  }
+  
   const p=getPos(e);
   coordEl.textContent=`${Math.round(p.x)}, ${Math.round(p.y)}`;
   if(draggingAnn){
@@ -409,9 +504,9 @@ canvas.addEventListener('mousemove',e=>{
   }
   if(drawing){redraw();drawPreview(startX,startY,p.x,p.y);}
 });
-canvas.addEventListener('mouseleave',()=>{coordEl.textContent='';});
 
 canvas.addEventListener('mouseup',e=>{
+  if(isPanning) { isPanning = false; canvas.style.cursor = mode === 'move' ? 'move' : 'crosshair'; return; }
   if(draggingAnn){ draggingAnn=null; canvas.style.cursor='move'; return; }
   if(!drawing)return; drawing=false;
   const p=getPos(e);
@@ -422,6 +517,15 @@ canvas.addEventListener('mouseup',e=>{
 /* Touch Events */
 canvas.addEventListener('touchstart',e=>{
   if(!imgLoaded)return; e.preventDefault();
+  
+  if(e.touches.length === 2) {
+    isPanning = true;
+    lastPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    panStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - transX;
+    panStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - transY;
+    return;
+  }
+
   const p=getPos(e);
   if(mode==='move'){
     draggingAnn=getHitAnn(p);
@@ -432,6 +536,31 @@ canvas.addEventListener('touchstart',e=>{
 
 canvas.addEventListener('touchmove',e=>{
   if(!imgLoaded)return; e.preventDefault();
+  
+  if(e.touches.length === 2 && isPanning) {
+    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    
+    // Zoom
+    const delta = dist / lastPinchDist;
+    const rect = canvasContainer.getBoundingClientRect();
+    const zoomX = midX - rect.left;
+    const zoomY = midY - rect.top;
+    
+    transX -= zoomX * (delta - 1);
+    transY -= zoomY * (delta - 1);
+    scale *= delta;
+    lastPinchDist = dist;
+
+    // Pan
+    transX = midX - panStartX;
+    transY = midY - panStartY;
+    
+    updateTransform();
+    return;
+  }
+
   const p=getPos(e);
   if(draggingAnn){
     const dx=p.x-draggingAnn.x1-dragOffX, dy=p.y-draggingAnn.y1-dragOffY;
@@ -442,6 +571,7 @@ canvas.addEventListener('touchmove',e=>{
 
 canvas.addEventListener('touchend',e=>{
   if(!imgLoaded)return; e.preventDefault();
+  if(e.touches.length < 2) isPanning = false;
   if(draggingAnn){ draggingAnn=null; return; }
   if(!drawing)return; drawing=false;
   const p=getPos(e);
@@ -547,6 +677,15 @@ document.getElementById('btn-save').addEventListener('click',()=>{
     drawCallout(oc,sc,sx);
   });
   const a=document.createElement('a');a.download='defect_report.png';a.href=out.toDataURL('image/png');a.click();
+  
+  // Feedback
+  const oldText = statusEl.textContent;
+  statusEl.textContent = "✅ បានរក្សាទុកដោយជោគជ័យ!";
+  statusEl.style.color = "#4CAF50";
+  setTimeout(() => { 
+    statusEl.textContent = oldText; 
+    statusEl.style.color = ""; 
+  }, 3000);
 });
 </script>
 
