@@ -1,190 +1,225 @@
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0; -webkit-tap-highlight-color:transparent}
-:root{
-  --primary:#378ADD;
-  --primary-dark:#2c6fb3;
-  --bg-app:#f0f2f5;
-  --bg-card:#ffffff;
-  --border-color:#e0e0e0;
-  --text-main:#1a1a1a;
-  --text-sub:#666;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--r:14px;--mob-nav:72px;--mob-top:56px}
+body{font-family:var(--font-sans)}
+
+/* ══ SHELL ══ */
+#app{display:flex;flex-direction:column;height:640px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary);position:relative}
+
+/* ══ DESKTOP ══ */
+#desk-top{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);flex-wrap:wrap;flex-shrink:0}
+#desk-main{display:flex;flex:1;overflow:hidden}
+#desk-side{width:230px;flex-shrink:0;display:flex;flex-direction:column;border-right:0.5px solid var(--color-border-tertiary);overflow:hidden}
+#desk-search-wrap{padding:8px;border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0;position:relative}
+#desk-search{width:100%;padding:7px 10px 7px 32px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:12px;outline:none}
+#desk-search:focus{border-color:#378ADD;box-shadow:0 0 0 2px rgba(55,138,221,.15)}
+#desk-si{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--color-text-tertiary);pointer-events:none}
+#desk-def-scroll{flex:1;overflow-y:auto;padding:6px}
+#desk-ann{border-top:0.5px solid var(--color-border-tertiary);padding:6px;max-height:150px;overflow-y:auto;flex-shrink:0}
+#canvas-col{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#canvas-area{flex:1;position:relative;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}
+#desk-bot{padding:4px 10px;background:var(--color-background-secondary);border-top:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px;font-size:11px;color:var(--color-text-secondary);flex-shrink:0}
+.tb-btn{display:flex;align-items:center;gap:4px;padding:5px 9px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap;transition:all .1s;flex-shrink:0}
+.tb-btn:hover{background:var(--color-background-secondary)}
+.tb-btn.on{background:#E6F1FB;border-color:#378ADD;color:#0C447C}
+.tb-btn i{font-size:14px}
+.tb-sep{width:0.5px;height:22px;background:var(--color-border-tertiary);flex-shrink:0}
+.kbd{background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:3px;padding:0 3px;font-size:9px;font-family:var(--font-mono)}
+#desk-color{width:26px;height:26px;border:0.5px solid var(--color-border-secondary);border-radius:5px;padding:1px;cursor:pointer;background:none;flex-shrink:0}
+#desk-size{width:55px;accent-color:#378ADD;flex-shrink:0}
+label[for=file-in]{cursor:pointer}
+#file-in{display:none}
+.sec-lbl{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.5px;padding:2px 2px 4px}
+.def-item{display:flex;align-items:center;gap:7px;padding:5px 7px;border:0.5px solid transparent;border-radius:6px;cursor:pointer;transition:all .1s;margin-bottom:2px}
+.def-item:hover{background:var(--color-background-secondary);border-color:var(--color-border-tertiary)}
+.def-item.sel{background:#E6F1FB;border-color:#378ADD}
+.def-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.def-km{font-size:11.5px;color:var(--color-text-primary);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.def-zh{font-size:10px;color:var(--color-text-tertiary)}
+.def-item.sel .def-km{color:#0C447C;font-weight:500}
+.def-item.sel .def-zh{color:#185FA5}
+.no-res{font-size:12px;color:var(--color-text-tertiary);text-align:center;padding:14px 6px}
+.log-item{display:flex;align-items:flex-start;gap:5px;padding:4px 5px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:5px;margin-bottom:3px}
+.log-num{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;color:#fff;flex-shrink:0;margin-top:1px}
+.log-lbl{flex:1;font-size:11px;line-height:1.3;color:var(--color-text-primary)}
+.log-zh{font-size:9.5px;color:var(--color-text-secondary)}
+.log-del{background:none;border:none;cursor:pointer;color:var(--color-text-tertiary);font-size:12px;padding:0 2px;border-radius:3px;flex-shrink:0}
+.log-del:hover{color:#E24B4A}
+#bg-img{object-fit:contain;pointer-events:none;user-select:none;display:none;position:absolute}
+#ann-canvas{position:absolute;cursor:crosshair}
+#hint{color:#888;font-size:13px;text-align:center;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px}
+#hint i{font-size:36px;color:#555}
+
+/* ══ MOBILE ONLY ══ */
+#mob-top{display:none}
+#mob-nav{display:none}
+#mob-sheet-overlay{display:none}
+#mob-sheet{display:none}
+
+@media(max-width:640px){
+  #app{height:100vh;height:100dvh;border:none;border-radius:0}
+  #desk-top,#desk-side{display:none!important}
+  #desk-bot{display:none!important}
+  #desk-main{flex:1;overflow:hidden}
+  #canvas-col{flex:1}
+
+  /* mobile top bar */
+  #mob-top{display:flex;align-items:center;gap:8px;padding:0 12px;height:var(--mob-top);background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0;z-index:10}
+  #mob-logo{font-size:13px;font-weight:500;color:var(--color-text-primary);flex:1}
+  #mob-sel-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:11px;color:var(--color-text-secondary);cursor:pointer;max-width:170px;overflow:hidden}
+  #mob-sel-badge.active{background:#E6F1FB;border-color:#378ADD;color:#0C447C}
+  #mob-sel-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#ccc}
+  #mob-sel-text{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1}
+  #mob-upload{width:38px;height:38px;border-radius:50%;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+  #mob-upload i{font-size:18px;color:var(--color-text-secondary)}
+  #mob-save{width:38px;height:38px;border-radius:50%;border:none;background:#3B6D11;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+  #mob-save i{font-size:18px;color:#fff}
+
+  /* mobile bottom nav */
+  #mob-nav{display:flex;align-items:stretch;height:var(--mob-nav);background:var(--color-background-secondary);border-top:0.5px solid var(--color-border-tertiary);padding:8px 6px;gap:5px;flex-shrink:0}
+  .mnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0.5px solid var(--color-border-secondary);border-radius:12px;background:var(--color-background-primary);cursor:pointer;transition:all .15s;padding:6px 2px;min-width:0}
+  .mnav-btn i{font-size:22px;color:var(--color-text-secondary)}
+  .mnav-btn span{font-size:10px;color:var(--color-text-secondary);white-space:nowrap}
+  .mnav-btn.on{background:#E6F1FB;border-color:#378ADD}
+  .mnav-btn.on i,.mnav-btn.on span{color:#0C447C}
+  .mnav-btn.danger{background:#FCEBEB;border-color:#F09595}
+  .mnav-btn.danger i,.mnav-btn.danger span{color:#A32D2D}
+  .mnav-btn.success{background:#EAF3DE;border-color:#97C459}
+  .mnav-btn.success i,.mnav-btn.success span{color:#27500A}
+  #mob-color-btn{position:relative}
+  #mob-color-inp{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+
+  /* bottom sheet */
+  #mob-sheet-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,0);z-index:100;pointer-events:none;transition:background .25s}
+  #mob-sheet-overlay.vis{background:rgba(0,0,0,.45);pointer-events:all}
+  #mob-sheet{display:flex;flex-direction:column;position:fixed;bottom:0;left:0;right:0;height:72vh;background:var(--color-background-primary);border-radius:20px 20px 0 0;z-index:101;transform:translateY(100%);transition:transform .28s cubic-bezier(.32,.72,0,1)}
+  #mob-sheet.open{transform:translateY(0)}
+  #sheet-handle{width:36px;height:4px;background:var(--color-border-secondary);border-radius:2px;margin:10px auto 0}
+  #sheet-head{display:flex;align-items:center;gap:8px;padding:10px 14px 8px;flex-shrink:0}
+  #sheet-head h3{font-size:14px;font-weight:500;color:var(--color-text-primary);flex:1}
+  #sheet-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--color-text-secondary);line-height:1;padding:4px}
+  #mob-search-wrap{padding:0 12px 10px;flex-shrink:0;position:relative}
+  #mob-search{width:100%;padding:10px 14px 10px 38px;border:0.5px solid var(--color-border-secondary);border-radius:12px;background:var(--color-background-secondary);color:var(--color-text-primary);font-size:14px;outline:none}
+  #mob-search:focus{border-color:#378ADD;box-shadow:0 0 0 3px rgba(55,138,221,.15)}
+  #mob-si{position:absolute;left:26px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--color-text-tertiary);pointer-events:none}
+  #sheet-list{flex:1;overflow-y:auto;padding:4px 10px 16px}
+  .sdef-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border:0.5px solid transparent;border-radius:12px;cursor:pointer;transition:all .12s;margin-bottom:4px}
+  .sdef-item:active{transform:scale(.98)}
+  .sdef-item:hover{background:var(--color-background-secondary);border-color:var(--color-border-tertiary)}
+  .sdef-item.sel{background:#E6F1FB;border-color:#378ADD}
+  .sdef-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .sdef-km{font-size:14px;color:var(--color-text-primary);display:block;font-weight:500}
+  .sdef-zh{font-size:12px;color:var(--color-text-secondary)}
+  .sdef-item.sel .sdef-km{color:#0C447C}
+  .sdef-item.sel .sdef-zh{color:#185FA5}
+  .hl{background:#FFF3CC;border-radius:2px;font-weight:600}
+  /* hide desktop canvas controls on mobile */
+  #mob-size-wrap{display:none}
 }
-body{font-family:'Inter', -apple-system, system-ui, sans-serif; background:var(--bg-app); color:var(--text-main); height:100vh; overflow:hidden}
-
-/* ── Layout shell ── */
-#app{display:flex;flex-direction:column;height:100vh;max-width:1400px;margin:0 auto;background:#fff;position:relative}
-
-#topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--border-color);z-index:100;flex-shrink:0}
-#main{display:flex;flex:1;overflow:hidden;position:relative}
-#sidebar{width:280px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border-color);background:#fff;transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);z-index:200}
-#canvas-col{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#1a1a1a;position:relative}
-#canvas-area{flex:1;position:relative;overflow:hidden;background:#1a1a1a;touch-action:none}
-#canvas-container{position:absolute; top:0; left:0; transition:transform 0.1s ease-out; transform-origin:0 0}
-#bg-img{width:100%; height:100%; object-fit:contain; pointer-events:none; user-select:none; display:none; position:absolute; top:0; left:0}
-
-/* ── Components ── */
-.tb-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--border-color);border-radius:10px;background:#fff;color:var(--text-main);cursor:pointer;font-size:14px;font-weight:600;transition:all 0.2s;user-select:none;white-space:nowrap}
-.tb-btn:active{transform:scale(0.95)}
-.tb-btn.on{background:#e6f1fb;border-color:var(--primary);color:var(--primary)}
-.tb-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
-.tb-btn.primary:hover{background:var(--primary-dark)}
-
-.tool-group{display:flex;align-items:center;gap:6px;background:#f5f5f5;padding:4px;border-radius:12px}
-.range-wrap{display:flex;flex-direction:column;min-width:80px;padding:0 4px}
-.range-lbl{font-size:10px;color:var(--text-sub);font-weight:700;text-transform:uppercase}
-input[type=range]{accent-color:var(--primary);cursor:pointer}
-
-/* ── Sidebar & Defect List ── */
-#search-wrap{padding:16px;border-bottom:1px solid var(--border-color)}
-#search-box{width:100%;padding:10px 12px 10px 38px;border:1.5px solid var(--border-color);border-radius:10px;font-size:14px;outline:none;transition:border-color 0.2s}
-#search-box:focus{border-color:var(--primary)}
-#search-icon{position:absolute;left:28px;top:50%;transform:translateY(-50%);color:var(--text-sub)}
-
-#def-scroll{flex:1;overflow-y:auto;padding:12px}
-.sec-lbl{font-size:11px;font-weight:800;color:var(--text-sub);text-transform:uppercase;letter-spacing:1px;padding:8px 4px}
-.def-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;margin-bottom:6px;transition:background 0.2s;border:1px solid transparent}
-.def-item:hover{background:#f0f7ff}
-.def-item.sel{background:#e6f1fb;border-color:var(--primary)}
-.def-dot{width:12px;height:12px;border-radius:4px}
-.def-km{font-size:14px;font-weight:600;display:block}
-.def-zh{font-size:12px;color:var(--text-sub)}
-
-#ann-section{border-top:1px solid var(--border-color);padding:12px;max-height:250px;overflow-y:auto;background:#fafafa}
-
-/* ── Mobile UI Elements ── */
-#mob-bottom-bar{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-color);padding:8px 16px calc(8px + var(--safe-bottom));z-index:150;justify-content:space-around;align-items:center;box-shadow:0 -4px 12px rgba(0,0,0,0.05)}
-.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text-sub);border:none;background:none;font-size:10px;font-weight:600;flex:1}
-.mob-nav-btn i{font-size:22px;padding:6px 16px;border-radius:20px;transition:all 0.2s}
-.mob-nav-btn.active{color:var(--primary)}
-.mob-nav-btn.active i{background:#e6f1fb;color:var(--primary)}
-
-#mob-defect-fab{display:none;position:fixed;bottom:80px;right:20px;width:56px;height:56px;border-radius:28px;background:var(--primary);color:#fff;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(55,138,221,0.4);z-index:140;border:none;font-size:24px}
-
-/* ── Canvas ── */
-#hint{position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); color:#999; font-size:16px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; pointer-events:none}
-#hint i{font-size:64px;color:#333}
-#ann-canvas{position:absolute; top:0; left:0; cursor:crosshair;touch-action:none; user-select:none; -webkit-user-select:none}
-
-/* Zoom controls */
-.zoom-btns{position:absolute; top:20px; right:20px; display:flex; flex-direction:column; gap:8px; z-index:110}
-.z-btn{width:40px; height:40px; border-radius:8px; background:rgba(255,255,255,0.9); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-size:20px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-#bottombar{padding:8px 16px;background:#fff;border-top:1px solid var(--border-color);display:flex;align-items:center;font-size:12px;color:var(--text-sub)}
-
-/* ── Responsive ── */
-@media(max-width:768px){
-  #sidebar{position:fixed;bottom:0;left:0;right:0;width:100%;height:70vh;border-right:none;border-top:1px solid var(--border-color);border-radius:24px 24px 0 0;transform:translateY(100%);box-shadow:0 -10px 30px rgba(0,0,0,0.1)}
-  #sidebar.open{transform:translateY(0)}
-  #topbar .tool-group, #topbar #btn-save span, #topbar #btn-u span, #topbar label span, #topbar .kbd{display:none}
-  #topbar{padding:8px;justify-content:space-between}
-  #mob-bottom-bar, #mob-defect-fab{display:flex}
-  #canvas-col{margin-bottom:60px}
-  #bottombar{display:none}
-  .tb-btn{padding:8px 12px}
-  #sidebar-close{display:block;width:40px;height:4px;background:#ddd;margin:8px auto;border-radius:2px;border:none}
-   #search-wrap{padding:8px 16px}
-   .desktop-only{display:none !important}
-   .z-btn{width:36px; height:36px; font-size:18px}
-   .zoom-btns{top:10px; right:10px}
- }
-
-.hl{background:#FFF3CC;font-weight:700;border-radius:2px}
+@media(min-width:641px){
+  #mob-top,#mob-nav,#mob-sheet,#mob-sheet-overlay{display:none!important}
+}
 </style>
 
+<!-- MOBILE TOP -->
 <div id="app">
-  <!-- TOP BAR -->
-  <div id="topbar">
-    <div style="display:flex;gap:8px">
-      <label for="file-in" class="tb-btn" title="រូបភាព"><i class="ti ti-photo-up"></i><span>រូបភាព</span></label>
-      <input type="file" id="file-in" accept="image/*">
-      <button class="tb-btn" id="btn-u" title="Undo"><i class="ti ti-arrow-back-up"></i><span>Undo</span></button>
-    </div>
+<h2 class="sr-only">ឧបករណ៍គូសសញ្ញាបញ្ហាផ្សា</h2>
 
-    <div class="tool-group desktop-only">
-      <button class="tb-btn" id="btn-m" title="Move (M)"><i class="ti ti-cursor-text"></i></button>
-      <button class="tb-btn on" id="btn-c" title="Circle (C)"><i class="ti ti-circle"></i></button>
-      <button class="tb-btn" id="btn-a" title="Arrow (A)"><i class="ti ti-arrow-up-right"></i></button>
-      <button class="tb-btn" id="btn-t" title="Text (T)"><i class="ti ti-text-size"></i></button>
-    </div>
-
-    <div class="tool-group desktop-only">
-      <input type="color" id="color-pick" value="#FF2222" title="Color">
-      <div class="range-wrap">
-        <div class="range-lbl">កម្រាស់</div>
-        <input type="range" id="size-range" min="1" max="8" value="2.5" step="0.5">
-      </div>
-      <div class="range-wrap">
-        <div class="range-lbl">អក្សរ</div>
-        <input type="range" id="text-range" min="8" max="24" value="12" step="1">
-      </div>
-    </div>
-
-    <div style="flex:1"></div>
-    
-    <button class="tb-btn primary" id="btn-save"><i class="ti ti-download"></i><span>រក្សាទុក</span></button>
+<div id="mob-top">
+  <span id="mob-logo"><i class="ti ti-wand" aria-hidden="true"></i> ស្នាមផ្សា</span>
+  <div id="mob-sel-badge" id="mob-pick-open">
+    <span id="mob-sel-dot"></span>
+    <span id="mob-sel-text">ជ្រើសប្រភេទ...</span>
+    <i class="ti ti-chevron-down" aria-hidden="true" style="font-size:12px;flex-shrink:0"></i>
   </div>
+  <label for="file-in" id="mob-upload"><i class="ti ti-photo-up" aria-hidden="true"></i></label>
+  <button id="mob-save"><i class="ti ti-download" aria-hidden="true"></i></button>
+</div>
+<input type="file" id="file-in" accept="image/*">
 
-  <div id="main">
-    <!-- SIDEBAR (Drawer on Mobile) -->
-    <div id="sidebar">
-      <button id="sidebar-close" aria-label="Close"></button>
-      <div id="search-wrap" style="position:relative">
-        <i class="ti ti-search" id="search-icon"></i>
-        <input type="text" id="search-box" placeholder="ស្វែងរកប្រភេទបញ្ហា..." autocomplete="off">
-      </div>
-      <div id="def-scroll">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding-right:12px">
-          <div class="sec-lbl">ប្រភេទបញ្ហា</div>
-          <button class="tb-btn" id="btn-clr-mob" style="padding:4px 8px; font-size:11px"><i class="ti ti-trash"></i> លុបទាំងអស់</button>
-        </div>
-        <div id="def-list"></div>
-      </div>
-      <div id="ann-section" class="desktop-only">
-        <div class="sec-lbl">ប្រវត្តិកែសម្រួល</div>
-        <div id="ann-log"><span style="font-size:12px;color:#999">មិនទាន់មានការគូស...</span></div>
-      </div>
-    </div>
-
-    <!-- CANVAS -->
-    <div id="canvas-col">
-      <div id="canvas-area">
-        <div id="hint"><i class="ti ti-photo-plus"></i><span>សូមបញ្ចូលរូបភាពដើម្បីចាប់ផ្តើម</span></div>
-        <div id="canvas-container">
-          <img id="bg-img" alt="Background">
-          <canvas id="ann-canvas"></canvas>
-        </div>
-        <div class="zoom-btns">
-          <button class="z-btn" id="z-in" title="Zoom In"><i class="ti ti-plus"></i></button>
-          <button class="z-btn" id="z-out" title="Zoom Out"><i class="ti ti-minus"></i></button>
-          <button class="z-btn" id="z-fit" title="Fit View"><i class="ti ti-maximize"></i></button>
-        </div>
-      </div>
-      <div id="bottombar">
-        <i class="ti ti-info-circle" style="margin-right:8px"></i>
-        <span id="status">សូមជ្រើសរើសប្រភេទបញ្ហា រួចចាប់ផ្តើមគូស</span>
-        <span style="margin-left:auto" id="coord"></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- MOBILE BOTTOM NAV -->
-  <div id="mob-bottom-bar">
-    <button class="mob-nav-btn" data-mode="move"><i class="ti ti-cursor-text"></i>រំកិល</button>
-    <button class="mob-nav-btn active" data-mode="circle"><i class="ti ti-circle"></i>រង្វង់</button>
-    <button class="mob-nav-btn" data-mode="arrow"><i class="ti ti-arrow-up-right"></i>ព្រួញ</button>
-    <button class="mob-nav-btn" data-mode="text"><i class="ti ti-text-size"></i>អក្សរ</button>
-    <div style="width:1px; height:24px; background:#eee"></div>
-    <input type="color" id="color-pick-mob" value="#FF2222" style="width:32px; height:32px; border:none; border-radius:50%; overflow:hidden; padding:0">
-  </div>
-
-  <button id="mob-defect-fab" title="ជ្រើសរើសប្រភេទបញ្ហា"><i class="ti ti-list"></i></button>
+<!-- DESKTOP TOP -->
+<div id="desk-top">
+  <label for="file-in" class="tb-btn"><i class="ti ti-photo-up" aria-hidden="true"></i>ចូលរូបភាព</label>
+  <div class="tb-sep"></div>
+  <button class="tb-btn on" id="btn-c"><i class="ti ti-circle" aria-hidden="true"></i>រង្វង់<span class="kbd">C</span></button>
+  <button class="tb-btn" id="btn-a"><i class="ti ti-arrow-up-right" aria-hidden="true"></i>ព្រួញ<span class="kbd">A</span></button>
+  <button class="tb-btn" id="btn-t"><i class="ti ti-text-size" aria-hidden="true"></i>អក្សរ<span class="kbd">T</span></button>
+  <div class="tb-sep"></div>
+  <input type="color" id="desk-color" value="#FF2222">
+  <input type="range" id="desk-size" min="1" max="6" value="2.5" step="0.5">
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="btn-u"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>Undo<span class="kbd">Z</span></button>
+  <button class="tb-btn" id="btn-clr"><i class="ti ti-trash" aria-hidden="true"></i>លុបទាំងអស់</button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="btn-save-desk" style="background:#EAF3DE;border-color:#3B6D11;color:#27500A"><i class="ti ti-download" aria-hidden="true"></i>រក្សាទុក</button>
 </div>
 
+<!-- MAIN -->
+<div id="desk-main">
+  <!-- DESKTOP SIDEBAR -->
+  <div id="desk-side">
+    <div id="desk-search-wrap">
+      <i class="ti ti-search" id="desk-si" aria-hidden="true"></i>
+      <input type="text" id="desk-search" placeholder="ស្វែងរក..." autocomplete="off">
+    </div>
+    <div id="desk-def-scroll">
+      <div class="sec-lbl">ប្រភេទបញ្ហា</div>
+      <div id="desk-def-list"></div>
+    </div>
+    <div id="desk-ann">
+      <div class="sec-lbl">ការគូសសញ្ញា</div>
+      <div id="desk-ann-log"><span style="font-size:11px;color:var(--color-text-tertiary)">មិនទាន់មាន...</span></div>
+    </div>
+  </div>
 
+  <!-- CANVAS COLUMN -->
+  <div id="canvas-col">
+    <div id="canvas-area">
+      <div id="hint"><i class="ti ti-photo-plus" aria-hidden="true"></i><span>ចុច «ចូលរូបភាព» ឬ Paste Ctrl+V</span></div>
+      <img id="bg-img" alt="រូបភាព">
+      <canvas id="ann-canvas"></canvas>
+    </div>
+    <div id="desk-bot">
+      <i class="ti ti-info-circle" aria-hidden="true"></i>
+      <span id="desk-status">ជ្រើសប្រភេទបញ្ហា រួចគូសសញ្ញា</span>
+      <span style="margin-left:auto" id="desk-coord"></span>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div id="mob-nav">
+  <button class="mnav-btn on" id="mnav-c"><i class="ti ti-circle" aria-hidden="true"></i><span>រង្វង់</span></button>
+  <button class="mnav-btn" id="mnav-a"><i class="ti ti-arrow-up-right" aria-hidden="true"></i><span>ព្រួញ</span></button>
+  <button class="mnav-btn" id="mnav-t"><i class="ti ti-text-size" aria-hidden="true"></i><span>អក្សរ</span></button>
+  <button class="mnav-btn" id="mob-color-btn">
+    <input type="color" id="mob-color-inp" value="#FF2222" aria-label="ជ្រើសពណ៌">
+    <i class="ti ti-palette" aria-hidden="true"></i><span>ពណ៌</span>
+  </button>
+  <button class="mnav-btn" id="mnav-u"><i class="ti ti-arrow-back-up" aria-hidden="true"></i><span>Undo</span></button>
+  <button class="mnav-btn" id="mnav-sheet"><i class="ti ti-list-search" aria-hidden="true"></i><span>ប្រភេទ</span></button>
+</div>
+
+<!-- MOBILE SHEET -->
+<div id="mob-sheet-overlay"></div>
+<div id="mob-sheet" role="dialog" aria-modal="true" aria-label="ជ្រើសប្រភេទបញ្ហា">
+  <div id="sheet-handle"></div>
+  <div id="sheet-head">
+    <h3>ជ្រើសប្រភេទបញ្ហា</h3>
+    <button id="sheet-close" aria-label="បិទ">✕</button>
+  </div>
+  <div id="mob-search-wrap">
+    <i class="ti ti-search" id="mob-si" aria-hidden="true"></i>
+    <input type="text" id="mob-search" placeholder="វាយស្វែងរក ខ្មែរ ឬ ចិន..." autocomplete="off">
+  </div>
+  <div id="sheet-list"></div>
+</div>
+
+</div><!-- /app -->
 
 <script>
-const DEFECTS = [
+const DEFECTS=[
   {zh:'開裂',km:'ផ្សាប្រេះសាច់បំពង់',c:'#E24B4A'},
   {zh:'焊破',km:'ផ្សាធ្លុះសាច់បំពង់',c:'#E24B4A'},
   {zh:'漏焊',km:'ភ្លេចថ្នេរផ្សា',c:'#BA7517'},
@@ -206,413 +241,186 @@ const DEFECTS = [
   {zh:'焊渣',km:'ផ្សាបែកទឹកអន្សា',c:'#BA7517'},
 ];
 
-/* ── DOM refs ── */
-const defListEl=document.getElementById('def-list');
-const annLogEl=document.getElementById('ann-log');
+/* refs */
 const bgImg=document.getElementById('bg-img');
 const canvas=document.getElementById('ann-canvas');
 const ctx=canvas.getContext('2d');
 const hint=document.getElementById('hint');
-const statusEl=document.getElementById('status');
-const coordEl=document.getElementById('coord');
-const colorPick=document.getElementById('color-pick');
-const colorPickMob=document.getElementById('color-pick-mob');
-const sizeRange=document.getElementById('size-range');
-const textRange=document.getElementById('text-range');
-const searchBox=document.getElementById('search-box');
-const sidebar=document.getElementById('sidebar');
-const sidebarClose=document.getElementById('sidebar-close');
-const mobDefectFab=document.getElementById('mob-defect-fab');
-const mobNavBtns=document.querySelectorAll('.mob-nav-btn');
+const deskColor=document.getElementById('desk-color');
+const deskSize=document.getElementById('desk-size');
+const mobColorInp=document.getElementById('mob-color-inp');
+const sheet=document.getElementById('mob-sheet');
+const sheetOverlay=document.getElementById('mob-sheet-overlay');
+const sheetList=document.getElementById('sheet-list');
+const mobSearch=document.getElementById('mob-search');
+const deskSearch=document.getElementById('desk-search');
+const mobSelBadge=document.getElementById('mob-sel-badge');
+const mobSelDot=document.getElementById('mob-sel-dot');
+const mobSelText=document.getElementById('mob-sel-text');
+const deskDefList=document.getElementById('desk-def-list');
+const deskAnnLog=document.getElementById('desk-ann-log');
 
-const canvasContainer=document.getElementById('canvas-container');
-const zIn=document.getElementById('z-in');
-const zOut=document.getElementById('z-out');
-const zFit=document.getElementById('z-fit');
+let mode='circle',selectedDef=null,annotations=[],drawing=false,startX,startY,imgLoaded=false;
 
-let mode='circle', selectedDef=null, annotations=[], drawing=false;
-let startX,startY,imgLoaded=false;
-let draggingAnn=null, dragOffX, dragOffY;
-let scale=1, transX=0, transY=0;
-let isPanning=false, panStartX, panStartY;
+function isMob(){return window.innerWidth<=640;}
+function getColor(){return isMob()?mobColorInp.value:deskColor.value;}
+function getSize(){return parseFloat(deskSize.value);}
 
-/* ── Zoom & Pan ── */
-function updateTransform(){
-  canvasContainer.style.transform=`translate(${transX}px, ${transY}px) scale(${scale})`;
+/* ── Sheet ── */
+function openSheet(){
+  sheet.classList.add('open');
+  sheetOverlay.classList.add('vis');
+  setTimeout(()=>mobSearch.focus(),300);
 }
-
-zIn.addEventListener('click',()=>{ scale *= 1.2; updateTransform(); });
-zOut.addEventListener('click',()=>{ scale /= 1.2; updateTransform(); });
-zFit.addEventListener('click',resetZoom);
-
-function resetZoom(){
-  if(!imgLoaded)return;
-  const area=document.getElementById('canvas-area');
-  const sc=Math.min(area.clientWidth/canvas.width, area.clientHeight/canvas.height, 1);
-  scale=sc;
-  transX=(area.clientWidth-canvas.width*scale)/2;
-  transY=(area.clientHeight-canvas.height*scale)/2;
-  updateTransform();
+function closeSheet(){
+  sheet.classList.remove('open');
+  sheetOverlay.classList.remove('vis');
 }
+document.getElementById('sheet-close').addEventListener('click',closeSheet);
+sheetOverlay.addEventListener('click',closeSheet);
+document.getElementById('mnav-sheet').addEventListener('click',openSheet);
+mobSelBadge.addEventListener('click',openSheet);
 
-// Mouse wheel zoom
-document.getElementById('canvas-area').addEventListener('wheel', e => {
-  if(!imgLoaded)return;
-  e.preventDefault();
-  const delta = e.deltaY > 0 ? 0.9 : 1.1;
-  const rect = canvasContainer.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
-  
-  transX -= mouseX * (delta - 1);
-  transY -= mouseY * (delta - 1);
-  scale *= delta;
-  updateTransform();
-}, {passive:false});
+/* touch-swipe to close sheet */
+let sheetY0=0;
+sheet.addEventListener('touchstart',e=>{sheetY0=e.touches[0].clientY;},{passive:true});
+sheet.addEventListener('touchend',e=>{if(e.changedTouches[0].clientY-sheetY0>60)closeSheet();},{passive:true});
 
-/* ── Mobile UI ── */
-if(mobDefectFab) mobDefectFab.addEventListener('click',()=>{ sidebar.classList.add('open'); });
-if(sidebarClose) sidebarClose.addEventListener('click',()=>{ sidebar.classList.remove('open'); });
-
-mobNavBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    setMode(btn.dataset.mode);
-  });
-});
-
-if(colorPickMob) {
-  colorPickMob.addEventListener('input', () => {
-    colorPick.value = colorPickMob.value;
-  });
-}
-if(colorPick) {
-  colorPick.addEventListener('input', () => {
-    if(colorPickMob) colorPickMob.value = colorPick.value;
-  });
-}
-
-/* ── Search & filter ── */
-function normalize(s){return s.toLowerCase().replace(/\s/g,'');}
-function highlight(text,q){
-  if(!q) return text;
-  const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
-  return text.replace(re,'<span class="hl">$1</span>');
+/* ── Defect rendering ── */
+function norm(s){return s.toLowerCase().replace(/\s/g,'');}
+function hlText(t,q){
+  if(!q)return t;
+  return t.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<span class="hl">$1</span>');
 }
 function scoreMatch(d,q){
-  const nq=normalize(q);
-  const nkm=normalize(d.km), nzh=normalize(d.zh);
-  if(nkm.includes(nq)||nzh.includes(nq)) return 2;
-  let ki=0,zi=0;
-  for(const ch of nq){ ki=nkm.indexOf(ch,ki)+1; zi=nzh.indexOf(ch,zi)+1; }
-  if(ki>0||zi>0) return 1;
-  return 0;
+  const nq=norm(q),nk=norm(d.km),nz=norm(d.zh);
+  if(nk.includes(nq)||nz.includes(nq))return 2;
+  let ki=0,zi=0;for(const c of nq){ki=nk.indexOf(c,ki)+1;zi=nz.indexOf(c,zi)+1;}
+  return(ki>0||zi>0)?1:0;
 }
 
-function renderDefects(q){
-  defListEl.innerHTML='';
-  const scored = DEFECTS.map((d,i)=>({d,i,s:q?scoreMatch(d,q):2})).filter(x=>x.s>0);
-  if(!scored.length){
-    defListEl.innerHTML='<div class="no-result" style="padding:20px;text-align:center;color:#999"><i class="ti ti-search-off"></i><br>រកមិនឃើញ</div>'; return;
-  }
-  scored.forEach(({d,i})=>{
+function renderSheet(q){
+  sheetList.innerHTML='';
+  const list=DEFECTS.map((d,i)=>({d,i,s:q?scoreMatch(d,q):2})).filter(x=>x.s>0);
+  if(!list.length){sheetList.innerHTML='<div class="no-res">រកមិនឃើញ</div>';return;}
+  list.forEach(({d,i})=>{
+    const el=document.createElement('div');
+    el.className='sdef-item'+(selectedDef===d?' sel':'');
+    el.dataset.i=i;
+    const kH=q?hlText(d.km,q):d.km,zH=q?hlText(d.zh,q):d.zh;
+    el.innerHTML=`<div class="sdef-dot" style="background:${d.c}"></div><div><span class="sdef-km">${kH}</span><span class="sdef-zh">${zH}</span></div>`;
+    el.addEventListener('click',()=>{selectDef(d);closeSheet();});
+    sheetList.appendChild(el);
+  });
+}
+
+function renderDesk(q){
+  deskDefList.innerHTML='';
+  const list=DEFECTS.map((d,i)=>({d,i,s:q?scoreMatch(d,q):2})).filter(x=>x.s>0);
+  if(!list.length){deskDefList.innerHTML='<div class="no-res">រកមិនឃើញ</div>';return;}
+  list.forEach(({d,i})=>{
     const el=document.createElement('div');
     el.className='def-item'+(selectedDef===d?' sel':'');
-    el.dataset.idx=i;
-    const kmH=q?highlight(d.km,q):d.km;
-    const zhH=q?highlight(d.zh,q):d.zh;
-    el.innerHTML=`<div class="def-dot" style="background:${d.c}"></div><div class="def-text"><span class="def-km">${kmH}</span><span class="def-zh">${zhH}</span></div>`;
-    el.addEventListener('click',()=>selectDef(d,el));
-    defListEl.appendChild(el);
+    el.dataset.i=i;
+    const kH=q?hlText(d.km,q):d.km,zH=q?hlText(d.zh,q):d.zh;
+    el.innerHTML=`<div class="def-dot" style="background:${d.c}"></div><div style="flex:1;min-width:0"><span class="def-km">${kH}</span><span class="def-zh">${zH}</span></div>`;
+    el.addEventListener('click',()=>selectDef(d));
+    deskDefList.appendChild(el);
   });
 }
 
-function selectDef(d, elClicked){
+function selectDef(d){
   selectedDef=d;
-  colorPick.value=d.c;
-  if(colorPickMob) colorPickMob.value = d.c;
-  document.querySelectorAll('.def-item').forEach(b=>b.classList.remove('sel'));
-  if(elClicked) elClicked.classList.add('sel');
-  statusEl.textContent=`ជ្រើស: ${d.km} · ${d.zh}`;
-  if(window.innerWidth<=768){ sidebar.classList.remove('open'); }
-  
-  // Auto-switch to drawing mode if in 'move' mode
-  if(mode==='move') setMode('circle');
-  
-  // Visual feedback: simple pulse
-  if(elClicked) {
-    elClicked.style.transform = 'scale(0.95)';
-    setTimeout(() => elClicked.style.transform = '', 100);
-  }
+  deskColor.value=d.c; mobColorInp.value=d.c;
+  mobSelDot.style.background=d.c;
+  mobSelBadge.classList.add('active');
+  mobSelText.textContent=d.km;
+  document.getElementById('mnav-sheet').classList.add('on');
+  renderSheet(mobSearch.value.trim());
+  renderDesk(deskSearch.value.trim());
+  if(document.getElementById('desk-status'))
+    document.getElementById('desk-status').textContent=`ជ្រើស: ${d.km} · ${d.zh}`;
 }
 
-searchBox.addEventListener('input',()=>{ renderDefects(searchBox.value.trim()); });
-searchBox.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    const first=defListEl.querySelector('.def-item');
-    if(first){ const i=parseInt(first.dataset.idx); selectDef(DEFECTS[i],first); searchBox.value=''; renderDefects(''); }
-  }
-  if(e.key==='Escape'){ searchBox.value=''; renderDefects(''); searchBox.blur(); }
+mobSearch.addEventListener('input',()=>renderSheet(mobSearch.value.trim()));
+mobSearch.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const f=sheetList.querySelector('.sdef-item');if(f){const i=parseInt(f.dataset.i);selectDef(DEFECTS[i]);closeSheet();mobSearch.value='';renderSheet('');}}
+  if(e.key==='Escape'){closeSheet();}
 });
-renderDefects('');
+deskSearch.addEventListener('input',()=>renderDesk(deskSearch.value.trim()));
+deskSearch.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const f=deskDefList.querySelector('.def-item');if(f){const i=parseInt(f.dataset.i);selectDef(DEFECTS[i]);deskSearch.value='';renderDesk('');}}
+});
 
-/* ── Tool mode ── */
-const btnM=document.getElementById('btn-m');
-const btnC=document.getElementById('btn-c');
-const btnA=document.getElementById('btn-a');
-const btnT=document.getElementById('btn-t');
+renderSheet(''); renderDesk('');
 
+/* ── Mode buttons ── */
 function setMode(m){
   mode=m;
-  if(btnM) btnM.classList.toggle('on',m==='move');
-  if(btnC) btnC.classList.toggle('on',m==='circle');
-  if(btnA) btnA.classList.toggle('on',m==='arrow');
-  if(btnT) btnT.classList.toggle('on',m==='text');
-  
-  mobNavBtns.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.mode === m);
+  ['c','a','t'].forEach(x=>{
+    document.getElementById('btn-'+x)?.classList.toggle('on',m===({c:'circle',a:'arrow',t:'text'}[x]));
+    document.getElementById('mnav-'+x)?.classList.toggle('on',m===({c:'circle',a:'arrow',t:'text'}[x]));
   });
-
-  canvas.style.cursor = (m==='text'?'text':(m==='move'?'move':'crosshair'));
-  if(m==='move') statusEl.textContent = "របៀបរំកិល៖ ចុចលើសញ្ញាណាមួយដើម្បីរំកិល";
-  else if(selectedDef) statusEl.textContent=`ជ្រើស: ${selectedDef.km} · ${selectedDef.zh}`;
+  canvas.style.cursor=m==='text'?'text':'crosshair';
 }
-btnM.addEventListener('click',()=>setMode('move'));
-btnC.addEventListener('click',()=>setMode('circle'));
-btnA.addEventListener('click',()=>setMode('arrow'));
-btnT.addEventListener('click',()=>setMode('text'));
-
+document.getElementById('btn-c')?.addEventListener('click',()=>setMode('circle'));
+document.getElementById('btn-a')?.addEventListener('click',()=>setMode('arrow'));
+document.getElementById('btn-t')?.addEventListener('click',()=>setMode('text'));
+document.getElementById('mnav-c').addEventListener('click',()=>setMode('circle'));
+document.getElementById('mnav-a').addEventListener('click',()=>setMode('arrow'));
+document.getElementById('mnav-t').addEventListener('click',()=>setMode('text'));
+document.getElementById('mnav-u').addEventListener('click',undoLast);
+document.getElementById('btn-u')?.addEventListener('click',undoLast);
+document.getElementById('btn-clr')?.addEventListener('click',clearAll);
+document.getElementById('mob-save').addEventListener('click',saveImg);
+document.getElementById('btn-save-desk')?.addEventListener('click',saveImg);
 document.addEventListener('keydown',e=>{
-  if(e.target.tagName==='INPUT') return;
-  const k=e.key.toLowerCase();
-  if(k==='m') setMode('move');
-  if(k==='c') setMode('circle');
-  if(k==='a') setMode('arrow');
-  if(k==='t') setMode('text');
-  if(k==='z') undoLast();
+  if(e.target.tagName==='INPUT')return;
+  if(e.key==='c'||e.key==='C')setMode('circle');
+  if(e.key==='a'||e.key==='A')setMode('arrow');
+  if(e.key==='t'||e.key==='T')setMode('text');
+  if(e.key==='z'||e.key==='Z')undoLast();
 });
 
-document.getElementById('btn-u').addEventListener('click',undoLast);
-const clearAll = () => {
-  if(confirm("តើអ្នកប្រាកដជាចង់លុបទាំងអស់មែនទេ?")){
-    annotations=[];redraw();
-    annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
-  }
-};
-
-document.getElementById('btn-clr').addEventListener('click', clearAll);
-const btnClrMob = document.getElementById('btn-clr-mob');
-if(btnClrMob) btnClrMob.addEventListener('click', clearAll);
-
-/* ── Image load ── */
+/* ── Image ── */
 document.getElementById('file-in').addEventListener('change',e=>{const f=e.target.files[0];if(f)loadImg(f);});
-document.addEventListener('paste',e=>{
-  for(const it of(e.clipboardData?.items||[])){if(it.type.startsWith('image/')){loadImg(it.getAsFile());break;}}
-});
+document.addEventListener('paste',e=>{for(const it of(e.clipboardData?.items||[])){if(it.type.startsWith('image/')){loadImg(it.getAsFile());break;}}});
 function loadImg(file){
-  if(!file) return;
-  const url=URL.createObjectURL(file);
-  hint.style.display='none';
-  
-  // Create a temporary image to get natural dimensions if needed, 
-  // but using the existing bgImg is fine.
-  bgImg.src=url; 
-  bgImg.onload=()=>{
-    if(bgImg.naturalWidth === 0 || bgImg.naturalHeight === 0) {
-      console.error("Failed to load image dimensions");
-      return;
-    }
-    imgLoaded=true; 
-    annotations=[];
-    annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
-    resizeCanvas();
-    
-    statusEl.textContent = "រូបភាពបានបញ្ចូលរួចរាល់! សូមជ្រើសរើសប្រភេទបញ្ហា។";
-    setTimeout(() => { 
-      if(selectedDef) statusEl.textContent=`ជ្រើស: ${selectedDef.km} · ${selectedDef.zh}`; 
-      else statusEl.textContent = "សូមជ្រើសរើសប្រភេទបញ្ហា រួចចាប់ផ្តើមគូស";
-    }, 3000);
-  };
-  bgImg.onerror=()=>{
-    statusEl.textContent = "❌ បរាជ័យក្នុងការបញ្ចូលរូបភាព!";
-    hint.style.display='flex';
-  };
+  bgImg.src=URL.createObjectURL(file);bgImg.style.display='block';hint.style.display='none';
+  bgImg.onload=()=>{imgLoaded=true;annotations=[];clearLogUI();resizeCanvas();};
 }
 function resizeCanvas(){
   if(!imgLoaded)return;
-  const area=document.getElementById('canvas-area');
-  const aW=area.clientWidth, aH=area.clientHeight;
-  if(aW === 0 || aH === 0) return;
-  
-  const sc=Math.min(aW/bgImg.naturalWidth, aH/bgImg.naturalHeight, 1);
-  const dW=Math.round(bgImg.naturalWidth*sc);
-  const dH=Math.round(bgImg.naturalHeight*sc);
-  
-  canvas.width = dW;
-  canvas.height = dH;
-  
-  canvasContainer.style.width = dW + 'px';
-  canvasContainer.style.height = dH + 'px';
-  
-  bgImg.style.display = 'block';
-  
-  resetZoom();
+  const a=document.getElementById('canvas-area');
+  const aW=a.clientWidth,aH=a.clientHeight;
+  const sc=Math.min(aW/bgImg.naturalWidth,aH/bgImg.naturalHeight,1);
+  const dW=Math.round(bgImg.naturalWidth*sc),dH=Math.round(bgImg.naturalHeight*sc);
+  const ox=Math.round((aW-dW)/2),oy=Math.round((aH-dH)/2);
+  bgImg.style.cssText=`display:block;position:absolute;left:${ox}px;top:${oy}px;width:${dW}px;height:${dH}px;transform:none`;
+  canvas.width=dW;canvas.height=dH;
+  canvas.style.cssText=`position:absolute;left:${ox}px;top:${oy}px;width:${dW}px;height:${dH}px;cursor:${mode==='text'?'text':'crosshair'}`;
+  redraw();
 }
 window.addEventListener('resize',()=>{if(imgLoaded)resizeCanvas();});
 
 /* ── Canvas events ── */
-function getPos(e){
-  const r=canvas.getBoundingClientRect(),s=(e.touches&&e.touches.length)?e.touches[0]:(e.changedTouches?e.changedTouches[0]:e);
-  return{x:(s.clientX-r.left)/scale,y:(s.clientY-r.top)/scale};
-}
-
-function getHitAnn(p){
-  for(let i=annotations.length-1; i>=0; i--){
-    const a=annotations[i];
-    const {x:bx,y:by}=badgeXY(a);
-    if(Math.sqrt((p.x-bx)**2+(p.y-by)**2)<20) return a;
-    if(a.mode==='circle'){
-      const cx=(a.x1+a.x2)/2, cy=(a.y1+a.y2)/2;
-      const rx=Math.abs(a.x2-a.x1)/2, ry=Math.abs(a.y2-a.y1)/2;
-      if(((p.x-cx)/Math.max(rx,10))**2 + ((p.y-cy)/Math.max(ry,10))**2 < 1.2) return a;
-    } else if(a.mode==='arrow'){
-      if(Math.sqrt((p.x-a.x1)**2+(p.y-a.y1)**2)<20 || Math.sqrt((p.x-a.x2)**2+(p.y-a.y2)**2)<20) return a;
-    } else if(a.mode==='text'){
-      if(Math.sqrt((p.x-a.x1)**2+(p.y-a.y1)**2)<30) return a;
-    }
-  }
-  return null;
-}
-
-let lastPinchDist = 0;
-
-canvas.addEventListener('mousedown',e=>{
-  if(!imgLoaded)return;
-  const p=getPos(e);
-  
-  // Pan with Middle Mouse or Space (not implemented yet)
-  if(e.button === 1 || (e.button === 0 && e.shiftKey)) {
-    isPanning = true;
-    panStartX = e.clientX - transX;
-    panStartY = e.clientY - transY;
-    canvas.style.cursor = 'grabbing';
-    return;
-  }
-
-  if(mode==='move'){
-    draggingAnn=getHitAnn(p);
-    if(draggingAnn){
-      dragOffX=p.x-draggingAnn.x1; dragOffY=p.y-draggingAnn.y1;
-      canvas.style.cursor='grabbing';
-    }
-    return;
-  }
-  if(mode==='text'){doText(p);return;}
-  drawing=true; startX=p.x; startY=p.y;
-});
-
+function getPos(e){const r=canvas.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
 canvas.addEventListener('mousemove',e=>{
-  if(isPanning) {
-    transX = e.clientX - panStartX;
-    transY = e.clientY - panStartY;
-    updateTransform();
-    return;
-  }
-  
   const p=getPos(e);
-  coordEl.textContent=`${Math.round(p.x)}, ${Math.round(p.y)}`;
-  if(draggingAnn){
-    const dx=p.x-draggingAnn.x1-dragOffX, dy=p.y-draggingAnn.y1-dragOffY;
-    draggingAnn.x1+=dx; draggingAnn.y1+=dy; draggingAnn.x2+=dx; draggingAnn.y2+=dy;
-    redraw(); return;
-  }
+  if(document.getElementById('desk-coord'))document.getElementById('desk-coord').textContent=`${Math.round(p.x)},${Math.round(p.y)}`;
   if(drawing){redraw();drawPreview(startX,startY,p.x,p.y);}
 });
+canvas.addEventListener('mousedown',e=>{if(!imgLoaded)return;if(mode==='text'){doText(getPos(e));return;}drawing=true;const p=getPos(e);startX=p.x;startY=p.y;});
+canvas.addEventListener('mouseup',e=>{if(!drawing)return;drawing=false;const p=getPos(e);if(Math.abs(p.x-startX)<4&&Math.abs(p.y-startY)<4)return;pushAnn(mode,startX,startY,p.x,p.y);});
+canvas.addEventListener('touchstart',e=>{e.preventDefault();if(!imgLoaded||mode==='text')return;drawing=true;const p=getPos(e);startX=p.x;startY=p.y;},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;const p=getPos(e);redraw();drawPreview(startX,startY,p.x,p.y);},{passive:false});
+canvas.addEventListener('touchend',e=>{e.preventDefault();if(!drawing)return;drawing=false;const t=e.changedTouches[0],r=canvas.getBoundingClientRect();pushAnn(mode,startX,startY,t.clientX-r.left,t.clientY-r.top);},{passive:false});
+canvas.addEventListener('click',e=>{if(mode==='text'&&imgLoaded)doText(getPos(e));});
 
-canvas.addEventListener('mouseup',e=>{
-  if(isPanning) { isPanning = false; canvas.style.cursor = mode === 'move' ? 'move' : 'crosshair'; return; }
-  if(draggingAnn){ draggingAnn=null; canvas.style.cursor='move'; return; }
-  if(!drawing)return; drawing=false;
-  const p=getPos(e);
-  if(Math.abs(p.x-startX)<4&&Math.abs(p.y-startY)<4)return;
-  pushAnn(mode,startX,startY,p.x,p.y);
-});
-
-/* Touch Events */
-canvas.addEventListener('touchstart',e=>{
-  if(!imgLoaded)return; e.preventDefault();
-  
-  if(e.touches.length === 2) {
-    isPanning = true;
-    lastPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-    panStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - transX;
-    panStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - transY;
-    return;
-  }
-
-  const p=getPos(e);
-  if(mode==='move'){
-    draggingAnn=getHitAnn(p);
-    if(draggingAnn){ dragOffX=p.x-draggingAnn.x1; dragOffY=p.y-draggingAnn.y1; }
-  } else if(mode==='text'){ doText(p); }
-  else { drawing=true; startX=p.x; startY=p.y; }
-},{passive:false});
-
-canvas.addEventListener('touchmove',e=>{
-  if(!imgLoaded)return; e.preventDefault();
-  
-  if(e.touches.length === 2 && isPanning) {
-    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-    const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-    const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-    
-    // Zoom
-    const delta = dist / lastPinchDist;
-    const rect = canvasContainer.getBoundingClientRect();
-    const zoomX = midX - rect.left;
-    const zoomY = midY - rect.top;
-    
-    transX -= zoomX * (delta - 1);
-    transY -= zoomY * (delta - 1);
-    scale *= delta;
-    lastPinchDist = dist;
-
-    // Pan
-    transX = midX - panStartX;
-    transY = midY - panStartY;
-    
-    updateTransform();
-    return;
-  }
-
-  const p=getPos(e);
-  if(draggingAnn){
-    const dx=p.x-draggingAnn.x1-dragOffX, dy=p.y-draggingAnn.y1-dragOffY;
-    draggingAnn.x1+=dx; draggingAnn.y1+=dy; draggingAnn.x2+=dx; draggingAnn.y2+=dy;
-    redraw();
-  } else if(drawing){ redraw(); drawPreview(startX,startY,p.x,p.y); }
-},{passive:false});
-
-canvas.addEventListener('touchend',e=>{
-  if(!imgLoaded)return; e.preventDefault();
-  if(e.touches.length < 2) isPanning = false;
-  if(draggingAnn){ draggingAnn=null; return; }
-  if(!drawing)return; drawing=false;
-  const p=getPos(e);
-  if(Math.abs(p.x-startX)<5&&Math.abs(p.y-startY)<5)return;
-  pushAnn(mode,startX,startY,p.x,p.y);
-},{passive:false});
-
-function doText(p){
-  if(!selectedDef){statusEl.textContent='⚠ សូមជ្រើសរើសប្រភេទបញ្ហាជាមុន!';return;}
-  pushAnn('text',p.x,p.y,p.x,p.y);
-}
+function doText(p){if(!selectedDef)return;pushAnn('text',p.x,p.y,p.x,p.y);}
 function pushAnn(m,x1,y1,x2,y2){
-  if(!selectedDef){statusEl.textContent='⚠ សូមជ្រើសរើសប្រភេទបញ្ហាជាមុន!';return;}
-  const ann={
-    mode:m,x1,y1,x2,y2,color:colorPick.value,
-    km:selectedDef.km,zh:selectedDef.zh,n:annotations.length+1,
-    fs:parseInt(textRange.value), lw:parseFloat(sizeRange.value)
-  };
+  if(!selectedDef){if(isMob())openSheet();else document.getElementById('desk-status').textContent='⚠ ជ្រើសប្រភេទបញ្ហាជាមុន!';return;}
+  const ann={mode:m,x1,y1,x2,y2,color:getColor(),km:selectedDef.km,zh:selectedDef.zh,n:annotations.length+1};
   annotations.push(ann);redraw();addLogItem(ann);
 }
 
@@ -628,32 +436,26 @@ function drawArrow(c,x1,y1,x2,y2,lw){
 function drawEllipse(c,x1,y1,x2,y2){
   c.beginPath();c.ellipse((x1+x2)/2,(y1+y2)/2,Math.max(Math.abs(x2-x1)/2,2),Math.max(Math.abs(y2-y1)/2,2),0,0,Math.PI*2);c.stroke();
 }
-function badgeXY(ann){
-  if(ann.mode==='circle')return{x:(ann.x1+ann.x2)/2,y:Math.min(ann.y1,ann.y2)};
-  if(ann.mode==='text') return {x:ann.x1, y:ann.y1};
-  return{x:ann.x2,y:ann.y2};
-}
+function badgeXY(a){return a.mode==='circle'?{x:(a.x1+a.x2)/2,y:Math.min(a.y1,a.y2)}:{x:a.x2,y:a.y2};}
 function drawLabel(c,ann,s){
   s=s||1;
-  const fsKm=Math.round(ann.fs*s),fsZh=Math.round((ann.fs-1)*s),pad=5*s,gap=3*s,br=10*s;
+  const fsK=Math.round(12*s),fsZ=Math.round(11*s),pad=5*s,gap=3*s,br=9*s;
   const {x:bx,y:by}=badgeXY(ann);
   c.save();
-  c.font=`bold ${fsKm}px sans-serif`;const wKm=c.measureText(ann.km).width;
-  c.font=`${fsZh}px sans-serif`;const wZh=c.measureText(ann.zh).width;
-  const boxW=Math.max(wKm,wZh)+pad*2,boxH=fsKm+gap+fsZh+pad*2;
-  const lbx=bx+br+5*s,lby=by-boxH/2;
-  c.fillStyle='rgba(0,0,0,0.8)';
-  c.beginPath();
-  if(c.roundRect)c.roundRect(lbx-pad,lby,boxW,boxH,5*s);else c.rect(lbx-pad,lby,boxW,boxH);
-  c.fill();
+  c.font=`bold ${fsK}px sans-serif`;const wK=c.measureText(ann.km).width;
+  c.font=`${fsZ}px sans-serif`;const wZ=c.measureText(ann.zh).width;
+  const bW=Math.max(wK,wZ)+pad*2,bH=fsK+gap+fsZ+pad*2;
+  const lx=bx+br+4*s,ly=by-bH/2;
+  c.fillStyle='rgba(0,0,0,.78)';
+  c.beginPath();if(c.roundRect)c.roundRect(lx-pad,ly,bW,bH,4*s);else c.rect(lx-pad,ly,bW,bH);c.fill();
   c.fillStyle=ann.color;c.beginPath();c.arc(bx,by,br,0,Math.PI*2);c.fill();
-  c.fillStyle='#fff';c.font=`bold ${Math.round(10*s)}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(ann.n,bx,by);
-  c.font=`bold ${fsKm}px sans-serif`;c.textAlign='left';c.textBaseline='top';c.fillStyle='#fff';c.fillText(ann.km,lbx,lby+pad);
-  c.font=`${fsZh}px sans-serif`;c.fillStyle='#ffd966';c.fillText(ann.zh,lbx,lby+pad+fsKm+gap);
+  c.fillStyle='#fff';c.font=`bold ${Math.round(9*s)}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(ann.n,bx,by);
+  c.font=`bold ${fsK}px sans-serif`;c.textAlign='left';c.textBaseline='top';c.fillStyle='#fff';c.fillText(ann.km,lx,ly+pad);
+  c.font=`${fsZ}px sans-serif`;c.fillStyle='#ffd966';c.fillText(ann.zh,lx,ly+pad+fsK+gap);
   c.restore();
 }
 function drawCallout(c,ann,s){
-  s=s||1; const lw=(ann.lw||2.5)*s;
+  s=s||1;const lw=getSize()*s;
   c.save();c.strokeStyle=ann.color;c.fillStyle=ann.color;c.lineWidth=lw;
   if(ann.mode==='circle')drawEllipse(c,ann.x1,ann.y1,ann.x2,ann.y2);
   else if(ann.mode==='arrow')drawArrow(c,ann.x1,ann.y1,ann.x2,ann.y2,lw);
@@ -661,8 +463,8 @@ function drawCallout(c,ann,s){
   drawLabel(c,ann,s);
 }
 function drawPreview(x1,y1,x2,y2){
-  const lw=parseFloat(sizeRange.value);
-  ctx.save();ctx.globalAlpha=.5;ctx.strokeStyle=colorPick.value;ctx.fillStyle=colorPick.value;ctx.lineWidth=lw;
+  const lw=getSize();
+  ctx.save();ctx.globalAlpha=.6;ctx.strokeStyle=getColor();ctx.fillStyle=getColor();ctx.lineWidth=lw;
   if(mode==='circle')drawEllipse(ctx,x1,y1,x2,y2);
   else if(mode==='arrow')drawArrow(ctx,x1,y1,x2,y2,lw);
   ctx.restore();
@@ -671,44 +473,23 @@ function redraw(){ctx.clearRect(0,0,canvas.width,canvas.height);annotations.forE
 
 /* ── Log ── */
 function addLogItem(ann){
-  const old=annLogEl.querySelector('span');if(old)old.remove();
+  const old=deskAnnLog.querySelector('span');if(old)old.remove();
   const item=document.createElement('div');item.className='log-item';item.dataset.n=ann.n;
-  item.innerHTML=`<div class="log-num" style="background:${ann.color}">${ann.n}</div><div class="log-lbl">${ann.km}<br><span class="log-zh">${ann.zh}</span></div><button class="log-del">✕</button>`;
-  item.querySelector('.log-del').addEventListener('click',()=>{
-    annotations=annotations.filter(a=>a.n!==ann.n);item.remove();redraw();
-    if(!annotations.length)annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
-  });
-  annLogEl.appendChild(item);annLogEl.scrollTop=annLogEl.scrollHeight;
+  item.innerHTML=`<div class="log-num" style="background:${ann.color}">${ann.n}</div><div class="log-lbl">${ann.km}<br><span class="log-zh">${ann.zh}</span></div><button class="log-del" aria-label="លុប">✕</button>`;
+  item.querySelector('.log-del').addEventListener('click',()=>{annotations=annotations.filter(a=>a.n!==ann.n);item.remove();redraw();if(!annotations.length)deskAnnLog.innerHTML='<span style="font-size:11px;color:var(--color-text-tertiary)">មិនទាន់មាន...</span>';});
+  deskAnnLog.appendChild(item);deskAnnLog.scrollTop=deskAnnLog.scrollHeight;
 }
-function undoLast(){
-  if(!annotations.length)return;
-  const last=annotations.pop();
-  const el=annLogEl.querySelector(`[data-n="${last.n}"]`);if(el)el.remove();
-  redraw();
-  if(!annotations.length)annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
-}
+function clearLogUI(){deskAnnLog.innerHTML='<span style="font-size:11px;color:var(--color-text-tertiary)">មិនទាន់មាន...</span>';}
+function undoLast(){if(!annotations.length)return;const l=annotations.pop();const el=deskAnnLog.querySelector(`[data-n="${l.n}"]`);if(el)el.remove();redraw();if(!annotations.length)deskAnnLog.innerHTML='<span style="font-size:11px;color:var(--color-text-tertiary)">មិនទាន់មាន...</span>';}
+function clearAll(){annotations=[];redraw();clearLogUI();}
 
 /* ── Save ── */
-document.getElementById('btn-save').addEventListener('click',()=>{
+function saveImg(){
   if(!imgLoaded)return;
-  const out=document.createElement('canvas');
-  out.width=bgImg.naturalWidth;out.height=bgImg.naturalHeight;
+  const out=document.createElement('canvas');out.width=bgImg.naturalWidth;out.height=bgImg.naturalHeight;
   const oc=out.getContext('2d');oc.drawImage(bgImg,0,0);
   const sx=bgImg.naturalWidth/canvas.width;
-  annotations.forEach(ann=>{
-    const sc={...ann,x1:ann.x1*sx,y1:ann.y1*sx,x2:ann.x2*sx,y2:ann.y2*sx};
-    drawCallout(oc,sc,sx);
-  });
+  annotations.forEach(ann=>{const sc={...ann,x1:ann.x1*sx,y1:ann.y1*sx,x2:ann.x2*sx,y2:ann.y2*sx};drawCallout(oc,sc,sx);});
   const a=document.createElement('a');a.download='defect_report.png';a.href=out.toDataURL('image/png');a.click();
-  
-  // Feedback
-  const oldText = statusEl.textContent;
-  statusEl.textContent = "✅ បានរក្សាទុកដោយជោគជ័យ!";
-  statusEl.style.color = "#4CAF50";
-  setTimeout(() => { 
-    statusEl.textContent = oldText; 
-    statusEl.style.color = ""; 
-  }, 3000);
-});
+}
 </script>
-
