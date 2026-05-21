@@ -1,144 +1,183 @@
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--top:44px;--bot:32px;--panel:240px}
-body{font-family:var(--font-sans);background:transparent}
+:root{
+  --top:48px;
+  --panel:260px;
+  --primary:#378ADD;
+  --primary-hover:#2c6fb3;
+  --bg-app:#f8f9fa;
+  --bg-sidebar:#ffffff;
+  --border-color:#e0e0e0;
+  --text-main:#333;
+  --text-sub:#666;
+}
+body{font-family:'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background:#eee; color:var(--text-main)}
 
 /* ── Layout shell ── */
-#app{display:flex;flex-direction:column;height:620px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
-#topbar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);flex-wrap:wrap;flex-shrink:0}
-#main{display:flex;flex:1;overflow:hidden}
-#sidebar{width:var(--panel);flex-shrink:0;display:flex;flex-direction:column;border-right:0.5px solid var(--color-border-tertiary);overflow:hidden}
-#canvas-col{flex:1;display:flex;flex-direction:column;overflow:hidden}
-#canvas-area{flex:1;position:relative;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}
-#bottombar{padding:4px 10px;background:var(--color-background-secondary);border-top:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px;font-size:11px;color:var(--color-text-secondary);flex-shrink:0}
+#app{display:flex;flex-direction:column;height:100vh;max-height:850px;max-width:1200px;margin:20px auto;border:1px solid var(--border-color);border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.1)}
+#topbar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;border-bottom:1px solid var(--border-color);flex-wrap:wrap;flex-shrink:0;z-index:10}
+#main{display:flex;flex:1;overflow:hidden;background:var(--bg-app)}
+#sidebar{width:var(--panel);flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border-color);background:var(--bg-sidebar);overflow:hidden}
+#canvas-col{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+#canvas-area{flex:1;position:relative;overflow:hidden;background:#222;display:flex;align-items:center;justify-content:center}
+#bottombar{padding:6px 12px;background:#fff;border-top:1px solid var(--border-color);display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text-sub);flex-shrink:0}
 
 /* ── Sidebar internals ── */
-#search-wrap{padding:8px;border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0}
-#search-box{width:100%;padding:6px 10px 6px 32px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:12px;outline:none}
-#search-box:focus{border-color:#378ADD;box-shadow:0 0 0 2px rgba(55,138,221,0.15)}
-#search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--color-text-tertiary);pointer-events:none}
-#def-scroll{flex:1;overflow-y:auto;padding:6px}
-#ann-section{border-top:0.5px solid var(--color-border-tertiary);padding:6px;flex-shrink:0;max-height:160px;overflow-y:auto}
-.sec-lbl{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.5px;padding:2px 2px 4px}
+#search-wrap{padding:12px;border-bottom:1px solid var(--border-color);flex-shrink:0}
+#search-box{width:100%;padding:8px 12px 8px 36px;border:1.5px solid var(--border-color);border-radius:8px;background:#fff;color:var(--text-main);font-size:13px;outline:none;transition:border-color 0.2s}
+#search-box:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(55,138,221,0.1)}
+#search-icon{position:absolute;left:22px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-sub);pointer-events:none}
+#def-scroll{flex:1;overflow-y:auto;padding:8px}
+#ann-section{border-top:1px solid var(--border-color);padding:8px;flex-shrink:0;max-height:200px;overflow-y:auto;background:#fafafa}
+.sec-lbl{font-size:11px;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:.8px;padding:4px 4px 8px}
 
 /* Defect items */
-.def-item{display:flex;align-items:center;gap:7px;padding:5px 7px;border:0.5px solid transparent;border-radius:6px;cursor:pointer;transition:all 0.1s;margin-bottom:2px}
-.def-item:hover{background:var(--color-background-secondary);border-color:var(--color-border-tertiary)}
-.def-item.sel{background:#E6F1FB;border-color:#378ADD}
-.def-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.def-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid transparent;border-radius:8px;cursor:pointer;transition:all 0.2s;margin-bottom:4px}
+.def-item:hover{background:#f0f7ff}
+.def-item.sel{background:#e6f1fb;border-color:var(--primary)}
+.def-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px rgba(0,0,0,0.05)}
 .def-text{flex:1;min-width:0}
-.def-km{font-size:11.5px;color:var(--color-text-primary);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.def-zh{font-size:10px;color:var(--color-text-tertiary)}
-.def-item.sel .def-km{color:#0C447C;font-weight:500}
+.def-km{font-size:13px;color:var(--text-main);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.def-zh{font-size:11px;color:var(--text-sub)}
+.def-item.sel .def-km{color:#0C447C;font-weight:600}
 .def-item.sel .def-zh{color:#185FA5}
-.no-result{font-size:12px;color:var(--color-text-tertiary);text-align:center;padding:16px 8px}
 
 /* Log items */
-.log-item{display:flex;align-items:flex-start;gap:5px;padding:4px 5px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:5px;margin-bottom:3px}
-.log-num{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;color:#fff;flex-shrink:0;margin-top:1px}
-.log-lbl{flex:1;font-size:11px;line-height:1.3;color:var(--color-text-primary)}
-.log-zh{font-size:9.5px;color:var(--color-text-secondary)}
-.log-del{background:none;border:none;cursor:pointer;color:var(--color-text-tertiary);font-size:12px;padding:0 2px;border-radius:3px;flex-shrink:0}
-.log-del:hover{color:#E24B4A}
+.log-item{display:flex;align-items:center;gap:8px;padding:6px 8px;background:#fff;border:1px solid var(--border-color);border-radius:6px;margin-bottom:4px;box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+.log-num{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.log-lbl{flex:1;font-size:12px;line-height:1.2;color:var(--text-main)}
+.log-zh{font-size:10px;color:var(--text-sub)}
+.log-del{background:none;border:none;cursor:pointer;color:#ccc;font-size:14px;padding:4px;border-radius:4px;transition:all 0.2s}
+.log-del:hover{color:#E24B4A;background:#fff0f0}
 
 /* Canvas */
 #bg-img{object-fit:contain;pointer-events:none;user-select:none;display:none;position:absolute}
 #ann-canvas{position:absolute;cursor:crosshair}
-#hint{color:#888;font-size:13px;text-align:center;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px}
-#hint i{font-size:36px;color:#555}
+#hint{color:#aaa;font-size:15px;text-align:center;padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px}
+#hint i{font-size:48px;color:#444}
 
 /* Toolbar buttons */
-.tb-btn{display:flex;align-items:center;gap:4px;padding:5px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap;transition:all 0.1s;flex-shrink:0}
-.tb-btn:hover{background:var(--color-background-secondary)}
-.tb-btn.on{background:#E6F1FB;border-color:#378ADD;color:#0C447C}
-.tb-btn i{font-size:14px}
-.tb-sep{width:0.5px;height:22px;background:var(--color-border-tertiary);flex-shrink:0}
-.kbd{background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:3px;padding:0 3px;font-size:9px;font-family:var(--font-mono)}
-#color-pick{width:26px;height:26px;border:0.5px solid var(--color-border-secondary);border-radius:5px;padding:1px;cursor:pointer;background:none;flex-shrink:0}
-#size-range{width:55px;accent-color:#378ADD;flex-shrink:0}
-label[for=file-in]{cursor:pointer}
-#file-in{display:none}
+.tb-btn{display:flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--border-color);border-radius:8px;background:#fff;color:var(--text-main);cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;transition:all 0.2s;flex-shrink:0;user-select:none}
+.tb-btn:hover{background:#f5f5f5;border-color:#ccc}
+.tb-btn.on{background:#e6f1fb;border-color:var(--primary);color:#0C447C;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05)}
+.tb-btn i{font-size:16px}
+.tb-sep{width:1px;height:24px;background:var(--border-color);margin:0 4px;flex-shrink:0}
+.kbd{display:inline-block;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;padding:0 4px;font-size:10px;font-family:monospace;margin-left:6px;color:#888}
+#color-pick{width:32px;height:32px;border:1px solid var(--border-color);border-radius:8px;padding:2px;cursor:pointer;background:#fff;flex-shrink:0}
+.tool-group{display:flex;align-items:center;gap:4px;background:#f8f9fa;padding:3px;border-radius:10px;border:1px solid var(--border-color)}
+.range-wrap{display:flex;flex-direction:column;gap:2px;min-width:70px}
+.range-lbl{font-size:9px;color:var(--text-sub);font-weight:700;text-transform:uppercase;text-align:center}
+#size-range, #text-range{width:100%;accent-color:var(--primary);cursor:pointer}
 
 /* Mobile panel toggle */
 #panel-toggle{display:none}
-#mob-panel{display:none}
 
-/* ── MOBILE ≤600px ── */
-@media(max-width:600px){
+/* ── MOBILE ≤768px ── */
+@media(max-width:768px){
   :root{--panel:100%}
-  #app{height:100vh;height:100dvh;border:none;border-radius:0}
-  #topbar{padding:5px 8px;gap:4px}
-  .tb-btn{padding:5px 7px;font-size:11px}
-  .kbd{display:none}
+  #app{margin:0;height:100vh;height:100dvh;border:none;border-radius:0;max-width:none;max-height:none}
+  #topbar{padding:8px;gap:6px;justify-content:center}
+  .tb-btn{padding:8px 10px;font-size:12px;border-radius:10px}
+  .tb-btn span, .kbd{display:none}
+  .tb-btn i{font-size:20px}
+  .tb-sep{height:20px;margin:0 2px}
   #main{flex-direction:column}
-  #sidebar{display:none;width:100%;border-right:none;border-top:0.5px solid var(--color-border-tertiary);max-height:55vh}
+  #sidebar{display:none;position:absolute;top:0;left:0;right:0;bottom:0;z-index:100;width:100%;height:100%}
   #sidebar.open{display:flex}
+  #sidebar-close{display:block}
   #canvas-col{flex:1;min-height:0}
-  #panel-toggle{display:flex;align-items:center;gap:4px;padding:5px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;font-size:12px;font-weight:500}
-  #panel-toggle.on{background:#E6F1FB;border-color:#378ADD;color:#0C447C}
+  #panel-toggle{display:flex;padding:8px 12px}
+  
+  /* Floating Action Buttons for Mobile */
+  .mob-tools{position:absolute;bottom:70px;right:20px;display:flex;flex-direction:column;gap:12px;z-index:20}
+  .fab{width:56px;height:56px;border-radius:28px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.3);border:none;cursor:pointer;font-size:24px}
+  
+  #bottombar{padding:10px 15px;font-size:13px}
+  .tool-group{padding:4px}
+  #color-pick{width:36px;height:36px}
 }
-/* highlight match */
+
 .hl{background:#FFF3CC;border-radius:2px;font-weight:600}
 </style>
 
 <div id="app">
-<h2 class="sr-only">ឧបករណ៍គូសសញ្ញាបញ្ហាផ្សា</h2>
-
 <!-- TOP BAR -->
 <div id="topbar">
-  <label for="file-in" class="tb-btn"><i class="ti ti-photo-up" aria-hidden="true"></i><span>ចូលរូបភាព</span></label>
+  <label for="file-in" class="tb-btn" title="បញ្ចូលរូបភាព"><i class="ti ti-photo-up"></i><span>រូបភាព</span></label>
   <input type="file" id="file-in" accept="image/*">
-  <button id="panel-toggle" class="tb-btn"><i class="ti ti-list-search" aria-hidden="true"></i>ប្រភេទ</button>
+  
   <div class="tb-sep"></div>
-  <button class="tb-btn on" id="btn-c"><i class="ti ti-circle" aria-hidden="true"></i>រង្វង់<span class="kbd">C</span></button>
-  <button class="tb-btn" id="btn-a"><i class="ti ti-arrow-up-right" aria-hidden="true"></i>ព្រួញ<span class="kbd">A</span></button>
-  <button class="tb-btn" id="btn-t"><i class="ti ti-text-size" aria-hidden="true"></i>អក្សរ<span class="kbd">T</span></button>
+  
+  <div class="tool-group">
+    <button class="tb-btn" id="btn-m" title="រំកិល (M)"><i class="ti ti-cursor-text"></i><span class="kbd">M</span></button>
+    <button class="tb-btn on" id="btn-c" title="រង្វង់ (C)"><i class="ti ti-circle"></i><span class="kbd">C</span></button>
+    <button class="tb-btn" id="btn-a" title="ព្រួញ (A)"><i class="ti ti-arrow-up-right"></i><span class="kbd">A</span></button>
+    <button class="tb-btn" id="btn-t" title="អក្សរ (T)"><i class="ti ti-text-size"></i><span class="kbd">T</span></button>
+  </div>
+
   <div class="tb-sep"></div>
-  <input type="color" id="color-pick" value="#FF2222" title="ពណ៌">
-  <input type="range" id="size-range" min="1" max="6" value="2.5" step="0.5" title="ទំហំខ្សែ">
+
+  <div class="tool-group">
+    <input type="color" id="color-pick" value="#FF2222" title="ពណ៌">
+    <div class="range-wrap">
+      <div class="range-lbl">កម្រាស់</div>
+      <input type="range" id="size-range" min="1" max="8" value="2.5" step="0.5">
+    </div>
+    <div class="range-wrap">
+      <div class="range-lbl">អក្សរ</div>
+      <input type="range" id="text-range" min="8" max="24" value="12" step="1">
+    </div>
+  </div>
+
   <div class="tb-sep"></div>
-  <button class="tb-btn" id="btn-u"><i class="ti ti-arrow-back-up" aria-hidden="true"></i>Undo<span class="kbd">Z</span></button>
-  <button class="tb-btn" id="btn-clr"><i class="ti ti-trash" aria-hidden="true"></i></button>
-  <div class="tb-sep"></div>
-  <button class="tb-btn" id="btn-save" style="background:#EAF3DE;border-color:#3B6D11;color:#27500A"><i class="ti ti-download" aria-hidden="true"></i>រក្សាទុក</button>
+  
+  <button class="tb-btn" id="btn-u" title="ត្រឡប់ក្រោយ (Z)"><i class="ti ti-arrow-back-up"></i><span>Undo</span></button>
+  <button class="tb-btn" id="btn-clr" title="លុបទាំងអស់"><i class="ti ti-trash"></i></button>
+  
+  <button id="panel-toggle" class="tb-btn"><i class="ti ti-list-search"></i><span>ប្រភេទបញ្ហា</span></button>
+  
+  <div style="flex:1"></div>
+  
+  <button class="tb-btn" id="btn-save" style="background:#4CAF50;border-color:#388E3C;color:#fff"><i class="ti ti-download"></i><span>រក្សាទុក</span></button>
 </div>
 
 <!-- MAIN -->
 <div id="main">
-
   <!-- SIDEBAR -->
   <div id="sidebar">
     <div id="search-wrap" style="position:relative">
-      <i class="ti ti-search" id="search-icon" aria-hidden="true"></i>
-      <input type="text" id="search-box" placeholder="វាយស្វែងរកប្រភេទបញ្ហា..." autocomplete="off" spellcheck="false">
+      <i class="ti ti-search" id="search-icon"></i>
+      <input type="text" id="search-box" placeholder="ស្វែងរកប្រភេទបញ្ហា..." autocomplete="off">
     </div>
     <div id="def-scroll">
-      <div class="sec-lbl">ប្រភេទបញ្ហាទាំងអស់</div>
+      <div class="sec-lbl">បញ្ជីប្រភេទបញ្ហា</div>
       <div id="def-list"></div>
     </div>
     <div id="ann-section">
-      <div class="sec-lbl">ការគូសសញ្ញា</div>
-      <div id="ann-log"><span style="font-size:11px;color:var(--color-text-tertiary)">មិនទាន់មាន...</span></div>
+      <div class="sec-lbl">ប្រវត្តិកែសម្រួល</div>
+      <div id="ann-log"><span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span></div>
     </div>
+    <!-- Mobile Close Sidebar -->
+    <button id="sidebar-close" style="display:none;padding:15px;background:var(--primary);color:#fff;border:none;font-weight:bold">បិទផ្ទាំងបញ្ជី</button>
   </div>
 
   <!-- CANVAS COLUMN -->
   <div id="canvas-col">
     <div id="canvas-area">
-      <div id="hint"><i class="ti ti-photo-plus" aria-hidden="true"></i><span>ចុច «ចូលរូបភាព» ឬ Paste Ctrl+V</span></div>
-      <img id="bg-img" alt="រូបភាព">
+      <div id="hint"><i class="ti ti-photo-plus"></i><span>ចុច «រូបភាព» ឬ Paste រូបភាពទីនេះ</span></div>
+      <img id="bg-img" alt="Background">
       <canvas id="ann-canvas"></canvas>
     </div>
     <div id="bottombar">
-      <i class="ti ti-info-circle" aria-hidden="true"></i>
-      <span id="status">ជ្រើសប្រភេទបញ្ហា រួចគូសសញ្ញា</span>
+      <i class="ti ti-info-circle"></i>
+      <span id="status">សូមជ្រើសរើសប្រភេទបញ្ហា រួចចាប់ផ្តើមគូស</span>
       <span style="margin-left:auto" id="coord"></span>
     </div>
   </div>
+</div>
+</div>
 
-</div><!-- /main -->
-</div><!-- /app -->
 
 <script>
 const DEFECTS = [
@@ -174,18 +213,19 @@ const statusEl=document.getElementById('status');
 const coordEl=document.getElementById('coord');
 const colorPick=document.getElementById('color-pick');
 const sizeRange=document.getElementById('size-range');
+const textRange=document.getElementById('text-range');
 const searchBox=document.getElementById('search-box');
 const sidebar=document.getElementById('sidebar');
 const panelToggle=document.getElementById('panel-toggle');
+const sidebarClose=document.getElementById('sidebar-close');
 
 let mode='circle', selectedDef=null, annotations=[], drawing=false;
 let startX,startY,imgLoaded=false;
+let draggingAnn=null, dragOffX, dragOffY;
 
-/* ── Mobile panel toggle ── */
-panelToggle.addEventListener('click',()=>{
-  sidebar.classList.toggle('open');
-  panelToggle.classList.toggle('on');
-});
+/* ── Mobile UI ── */
+panelToggle.addEventListener('click',()=>{ sidebar.classList.add('open'); });
+sidebarClose.addEventListener('click',()=>{ sidebar.classList.remove('open'); });
 
 /* ── Search & filter ── */
 function normalize(s){return s.toLowerCase().replace(/\s/g,'');}
@@ -198,7 +238,6 @@ function scoreMatch(d,q){
   const nq=normalize(q);
   const nkm=normalize(d.km), nzh=normalize(d.zh);
   if(nkm.includes(nq)||nzh.includes(nq)) return 2;
-  // fuzzy: all chars in order
   let ki=0,zi=0;
   for(const ch of nq){ ki=nkm.indexOf(ch,ki)+1; zi=nzh.indexOf(ch,zi)+1; }
   if(ki>0||zi>0) return 1;
@@ -209,7 +248,7 @@ function renderDefects(q){
   defListEl.innerHTML='';
   const scored = DEFECTS.map((d,i)=>({d,i,s:q?scoreMatch(d,q):2})).filter(x=>x.s>0);
   if(!scored.length){
-    defListEl.innerHTML='<div class="no-result"><i class="ti ti-search-off"></i><br>រកមិនឃើញ</div>'; return;
+    defListEl.innerHTML='<div class="no-result" style="padding:20px;text-align:center;color:#999"><i class="ti ti-search-off"></i><br>រកមិនឃើញ</div>'; return;
   }
   scored.forEach(({d,i})=>{
     const el=document.createElement('div');
@@ -229,16 +268,11 @@ function selectDef(d, elClicked){
   document.querySelectorAll('.def-item').forEach(b=>b.classList.remove('sel'));
   if(elClicked) elClicked.classList.add('sel');
   statusEl.textContent=`ជ្រើស: ${d.km} · ${d.zh}`;
-  // mobile: close panel after selection
-  if(window.innerWidth<=600){ sidebar.classList.remove('open'); panelToggle.classList.remove('on'); }
+  if(window.innerWidth<=768){ sidebar.classList.remove('open'); }
+  if(mode==='move') setMode('circle');
 }
 
-searchBox.addEventListener('input',()=>{
-  const q=searchBox.value.trim();
-  renderDefects(q);
-});
-
-// keyboard nav in search
+searchBox.addEventListener('input',()=>{ renderDefects(searchBox.value.trim()); });
 searchBox.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
     const first=defListEl.querySelector('.def-item');
@@ -246,34 +280,45 @@ searchBox.addEventListener('keydown',e=>{
   }
   if(e.key==='Escape'){ searchBox.value=''; renderDefects(''); searchBox.blur(); }
 });
-
 renderDefects('');
 
 /* ── Tool mode ── */
+const btnM=document.getElementById('btn-m');
 const btnC=document.getElementById('btn-c');
 const btnA=document.getElementById('btn-a');
 const btnT=document.getElementById('btn-t');
+
 function setMode(m){
   mode=m;
+  btnM.classList.toggle('on',m==='move');
   btnC.classList.toggle('on',m==='circle');
   btnA.classList.toggle('on',m==='arrow');
   btnT.classList.toggle('on',m==='text');
-  canvas.style.cursor=m==='text'?'text':'crosshair';
+  canvas.style.cursor = (m==='text'?'text':(m==='move'?'move':'crosshair'));
+  if(m==='move') statusEl.textContent = "របៀបរំកិល៖ ចុចលើសញ្ញាណាមួយដើម្បីរំកិល";
+  else if(selectedDef) statusEl.textContent=`ជ្រើស: ${selectedDef.km} · ${selectedDef.zh}`;
 }
+btnM.addEventListener('click',()=>setMode('move'));
 btnC.addEventListener('click',()=>setMode('circle'));
 btnA.addEventListener('click',()=>setMode('arrow'));
 btnT.addEventListener('click',()=>setMode('text'));
+
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT') return;
-  if(e.key==='c'||e.key==='C') setMode('circle');
-  if(e.key==='a'||e.key==='A') setMode('arrow');
-  if(e.key==='t'||e.key==='T') setMode('text');
-  if(e.key==='z'||e.key==='Z') undoLast();
+  const k=e.key.toLowerCase();
+  if(k==='m') setMode('move');
+  if(k==='c') setMode('circle');
+  if(k==='a') setMode('arrow');
+  if(k==='t') setMode('text');
+  if(k==='z') undoLast();
 });
+
 document.getElementById('btn-u').addEventListener('click',undoLast);
 document.getElementById('btn-clr').addEventListener('click',()=>{
-  annotations=[];redraw();
-  annLogEl.innerHTML='<span style="font-size:11px;color:var(--color-text-tertiary)">មិនទាន់មាន...</span>';
+  if(confirm("តើអ្នកប្រាកដជាចង់លុបទាំងអស់មែនទេ?")){
+    annotations=[];redraw();
+    annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
+  }
 });
 
 /* ── Image load ── */
@@ -284,7 +329,11 @@ document.addEventListener('paste',e=>{
 function loadImg(file){
   const url=URL.createObjectURL(file);
   bgImg.src=url; bgImg.style.display='block'; hint.style.display='none';
-  bgImg.onload=()=>{imgLoaded=true;annotations=[];annLogEl.innerHTML='<span style="font-size:11px;color:var(--color-text-tertiary)">មិនទាន់មាន...</span>';resizeCanvas();};
+  bgImg.onload=()=>{
+    imgLoaded=true; annotations=[];
+    annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
+    resizeCanvas();
+  };
 }
 function resizeCanvas(){
   if(!imgLoaded)return;
@@ -295,44 +344,111 @@ function resizeCanvas(){
   const ox=Math.round((aW-dW)/2),oy=Math.round((aH-dH)/2);
   bgImg.style.cssText=`display:block;position:absolute;left:${ox}px;top:${oy}px;width:${dW}px;height:${dH}px;transform:none`;
   canvas.width=dW;canvas.height=dH;
-  canvas.style.cssText=`position:absolute;left:${ox}px;top:${oy}px;width:${dW}px;height:${dH}px;cursor:${mode==='text'?'text':'crosshair'}`;
+  canvas.style.cssText=`position:absolute;left:${ox}px;top:${oy}px;width:${dW}px;height:${dH}px;cursor:${canvas.style.cursor}`;
   redraw();
 }
 window.addEventListener('resize',()=>{if(imgLoaded)resizeCanvas();});
 
 /* ── Canvas events ── */
 function getPos(e){
-  const r=canvas.getBoundingClientRect(),s=e.touches?e.touches[0]:e;
+  const r=canvas.getBoundingClientRect(),s=(e.touches&&e.touches.length)?e.touches[0]:(e.changedTouches?e.changedTouches[0]:e);
   return{x:s.clientX-r.left,y:s.clientY-r.top};
 }
+
+function getHitAnn(p){
+  for(let i=annotations.length-1; i>=0; i--){
+    const a=annotations[i];
+    const {x:bx,y:by}=badgeXY(a);
+    if(Math.sqrt((p.x-bx)**2+(p.y-by)**2)<20) return a;
+    if(a.mode==='circle'){
+      const cx=(a.x1+a.x2)/2, cy=(a.y1+a.y2)/2;
+      const rx=Math.abs(a.x2-a.x1)/2, ry=Math.abs(a.y2-a.y1)/2;
+      if(((p.x-cx)/Math.max(rx,10))**2 + ((p.y-cy)/Math.max(ry,10))**2 < 1.2) return a;
+    } else if(a.mode==='arrow'){
+      if(Math.sqrt((p.x-a.x1)**2+(p.y-a.y1)**2)<20 || Math.sqrt((p.x-a.x2)**2+(p.y-a.y2)**2)<20) return a;
+    } else if(a.mode==='text'){
+      if(Math.sqrt((p.x-a.x1)**2+(p.y-a.y1)**2)<30) return a;
+    }
+  }
+  return null;
+}
+
+canvas.addEventListener('mousedown',e=>{
+  if(!imgLoaded)return;
+  const p=getPos(e);
+  if(mode==='move'){
+    draggingAnn=getHitAnn(p);
+    if(draggingAnn){
+      dragOffX=p.x-draggingAnn.x1; dragOffY=p.y-draggingAnn.y1;
+      canvas.style.cursor='grabbing';
+    }
+    return;
+  }
+  if(mode==='text'){doText(p);return;}
+  drawing=true; startX=p.x; startY=p.y;
+});
+
 canvas.addEventListener('mousemove',e=>{
   const p=getPos(e);
   coordEl.textContent=`${Math.round(p.x)}, ${Math.round(p.y)}`;
+  if(draggingAnn){
+    const dx=p.x-draggingAnn.x1-dragOffX, dy=p.y-draggingAnn.y1-dragOffY;
+    draggingAnn.x1+=dx; draggingAnn.y1+=dy; draggingAnn.x2+=dx; draggingAnn.y2+=dy;
+    redraw(); return;
+  }
   if(drawing){redraw();drawPreview(startX,startY,p.x,p.y);}
 });
 canvas.addEventListener('mouseleave',()=>{coordEl.textContent='';});
-canvas.addEventListener('mousedown',e=>{
-  if(!imgLoaded)return;
-  if(mode==='text'){doText(getPos(e));return;}
-  drawing=true;const p=getPos(e);startX=p.x;startY=p.y;
-});
+
 canvas.addEventListener('mouseup',e=>{
-  if(!drawing)return;drawing=false;
+  if(draggingAnn){ draggingAnn=null; canvas.style.cursor='move'; return; }
+  if(!drawing)return; drawing=false;
   const p=getPos(e);
   if(Math.abs(p.x-startX)<4&&Math.abs(p.y-startY)<4)return;
   pushAnn(mode,startX,startY,p.x,p.y);
 });
-canvas.addEventListener('touchstart',e=>{e.preventDefault();if(!imgLoaded||mode==='text')return;drawing=true;const p=getPos(e);startX=p.x;startY=p.y;},{passive:false});
-canvas.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;const p=getPos(e);redraw();drawPreview(startX,startY,p.x,p.y);},{passive:false});
-canvas.addEventListener('touchend',e=>{e.preventDefault();if(!drawing)return;drawing=false;const t=e.changedTouches[0],r=canvas.getBoundingClientRect();pushAnn(mode,startX,startY,t.clientX-r.left,t.clientY-r.top);},{passive:false});
+
+/* Touch Events */
+canvas.addEventListener('touchstart',e=>{
+  if(!imgLoaded)return; e.preventDefault();
+  const p=getPos(e);
+  if(mode==='move'){
+    draggingAnn=getHitAnn(p);
+    if(draggingAnn){ dragOffX=p.x-draggingAnn.x1; dragOffY=p.y-draggingAnn.y1; }
+  } else if(mode==='text'){ doText(p); }
+  else { drawing=true; startX=p.x; startY=p.y; }
+},{passive:false});
+
+canvas.addEventListener('touchmove',e=>{
+  if(!imgLoaded)return; e.preventDefault();
+  const p=getPos(e);
+  if(draggingAnn){
+    const dx=p.x-draggingAnn.x1-dragOffX, dy=p.y-draggingAnn.y1-dragOffY;
+    draggingAnn.x1+=dx; draggingAnn.y1+=dy; draggingAnn.x2+=dx; draggingAnn.y2+=dy;
+    redraw();
+  } else if(drawing){ redraw(); drawPreview(startX,startY,p.x,p.y); }
+},{passive:false});
+
+canvas.addEventListener('touchend',e=>{
+  if(!imgLoaded)return; e.preventDefault();
+  if(draggingAnn){ draggingAnn=null; return; }
+  if(!drawing)return; drawing=false;
+  const p=getPos(e);
+  if(Math.abs(p.x-startX)<5&&Math.abs(p.y-startY)<5)return;
+  pushAnn(mode,startX,startY,p.x,p.y);
+},{passive:false});
 
 function doText(p){
-  if(!selectedDef){statusEl.textContent='⚠ ជ្រើសប្រភេទបញ្ហាជាមុន!';return;}
+  if(!selectedDef){statusEl.textContent='⚠ សូមជ្រើសរើសប្រភេទបញ្ហាជាមុន!';return;}
   pushAnn('text',p.x,p.y,p.x,p.y);
 }
 function pushAnn(m,x1,y1,x2,y2){
-  if(!selectedDef){statusEl.textContent='⚠ ជ្រើសប្រភេទបញ្ហាជាមុន!';return;}
-  const ann={mode:m,x1,y1,x2,y2,color:colorPick.value,km:selectedDef.km,zh:selectedDef.zh,n:annotations.length+1};
+  if(!selectedDef){statusEl.textContent='⚠ សូមជ្រើសរើសប្រភេទបញ្ហាជាមុន!';return;}
+  const ann={
+    mode:m,x1,y1,x2,y2,color:colorPick.value,
+    km:selectedDef.km,zh:selectedDef.zh,n:annotations.length+1,
+    fs:parseInt(textRange.value), lw:parseFloat(sizeRange.value)
+  };
   annotations.push(ann);redraw();addLogItem(ann);
 }
 
@@ -350,32 +466,30 @@ function drawEllipse(c,x1,y1,x2,y2){
 }
 function badgeXY(ann){
   if(ann.mode==='circle')return{x:(ann.x1+ann.x2)/2,y:Math.min(ann.y1,ann.y2)};
+  if(ann.mode==='text') return {x:ann.x1, y:ann.y1};
   return{x:ann.x2,y:ann.y2};
 }
 function drawLabel(c,ann,s){
   s=s||1;
-  const fsKm=Math.round(12*s),fsZh=Math.round(11*s),pad=5*s,gap=3*s,br=9*s;
+  const fsKm=Math.round(ann.fs*s),fsZh=Math.round((ann.fs-1)*s),pad=5*s,gap=3*s,br=10*s;
   const {x:bx,y:by}=badgeXY(ann);
   c.save();
   c.font=`bold ${fsKm}px sans-serif`;const wKm=c.measureText(ann.km).width;
   c.font=`${fsZh}px sans-serif`;const wZh=c.measureText(ann.zh).width;
   const boxW=Math.max(wKm,wZh)+pad*2,boxH=fsKm+gap+fsZh+pad*2;
-  const lbx=bx+br+4*s,lby=by-boxH/2;
-  c.fillStyle='rgba(0,0,0,0.75)';
+  const lbx=bx+br+5*s,lby=by-boxH/2;
+  c.fillStyle='rgba(0,0,0,0.8)';
   c.beginPath();
-  if(c.roundRect)c.roundRect(lbx-pad,lby,boxW,boxH,4*s);else c.rect(lbx-pad,lby,boxW,boxH);
+  if(c.roundRect)c.roundRect(lbx-pad,lby,boxW,boxH,5*s);else c.rect(lbx-pad,lby,boxW,boxH);
   c.fill();
-  // badge
   c.fillStyle=ann.color;c.beginPath();c.arc(bx,by,br,0,Math.PI*2);c.fill();
-  c.fillStyle='#fff';c.font=`bold ${Math.round(9*s)}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(ann.n,bx,by);
-  // km
+  c.fillStyle='#fff';c.font=`bold ${Math.round(10*s)}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(ann.n,bx,by);
   c.font=`bold ${fsKm}px sans-serif`;c.textAlign='left';c.textBaseline='top';c.fillStyle='#fff';c.fillText(ann.km,lbx,lby+pad);
-  // zh
   c.font=`${fsZh}px sans-serif`;c.fillStyle='#ffd966';c.fillText(ann.zh,lbx,lby+pad+fsKm+gap);
   c.restore();
 }
 function drawCallout(c,ann,s){
-  s=s||1;const lw=parseFloat(sizeRange.value)*s;
+  s=s||1; const lw=(ann.lw||2.5)*s;
   c.save();c.strokeStyle=ann.color;c.fillStyle=ann.color;c.lineWidth=lw;
   if(ann.mode==='circle')drawEllipse(c,ann.x1,ann.y1,ann.x2,ann.y2);
   else if(ann.mode==='arrow')drawArrow(c,ann.x1,ann.y1,ann.x2,ann.y2,lw);
@@ -384,7 +498,7 @@ function drawCallout(c,ann,s){
 }
 function drawPreview(x1,y1,x2,y2){
   const lw=parseFloat(sizeRange.value);
-  ctx.save();ctx.globalAlpha=.6;ctx.strokeStyle=colorPick.value;ctx.fillStyle=colorPick.value;ctx.lineWidth=lw;
+  ctx.save();ctx.globalAlpha=.5;ctx.strokeStyle=colorPick.value;ctx.fillStyle=colorPick.value;ctx.lineWidth=lw;
   if(mode==='circle')drawEllipse(ctx,x1,y1,x2,y2);
   else if(mode==='arrow')drawArrow(ctx,x1,y1,x2,y2,lw);
   ctx.restore();
@@ -395,10 +509,10 @@ function redraw(){ctx.clearRect(0,0,canvas.width,canvas.height);annotations.forE
 function addLogItem(ann){
   const old=annLogEl.querySelector('span');if(old)old.remove();
   const item=document.createElement('div');item.className='log-item';item.dataset.n=ann.n;
-  item.innerHTML=`<div class="log-num" style="background:${ann.color}">${ann.n}</div><div class="log-lbl">${ann.km}<br><span class="log-zh">${ann.zh}</span></div><button class="log-del" aria-label="លុប">✕</button>`;
+  item.innerHTML=`<div class="log-num" style="background:${ann.color}">${ann.n}</div><div class="log-lbl">${ann.km}<br><span class="log-zh">${ann.zh}</span></div><button class="log-del">✕</button>`;
   item.querySelector('.log-del').addEventListener('click',()=>{
     annotations=annotations.filter(a=>a.n!==ann.n);item.remove();redraw();
-    if(!annotations.length)annLogEl.innerHTML='<span style="font-size:11px;color:var(--color-text-tertiary)">មិនទាន់មាន...</span>';
+    if(!annotations.length)annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
   });
   annLogEl.appendChild(item);annLogEl.scrollTop=annLogEl.scrollHeight;
 }
@@ -407,7 +521,7 @@ function undoLast(){
   const last=annotations.pop();
   const el=annLogEl.querySelector(`[data-n="${last.n}"]`);if(el)el.remove();
   redraw();
-  if(!annotations.length)annLogEl.innerHTML='<span style="font-size:11px;color:var(--color-text-tertiary)">មិនទាន់មាន...</span>';
+  if(!annotations.length)annLogEl.innerHTML='<span style="font-size:11px;color:#999">មិនទាន់មានការគូស...</span>';
 }
 
 /* ── Save ── */
@@ -424,3 +538,4 @@ document.getElementById('btn-save').addEventListener('click',()=>{
   const a=document.createElement('a');a.download='defect_report.png';a.href=out.toDataURL('image/png');a.click();
 });
 </script>
+
